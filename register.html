@@ -261,7 +261,7 @@
         import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, fetchSignInMethodsForEmail, signInWithEmailAndPassword, linkWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAjpyAqo4ISrUUuLrUpNwF13ZLl5Nvz3T4", authDomain: "gameboxarmindo.firebaseapp.com", projectId: "gameboxarmindo", storageBucket: "gameboxarmindo.appspot.com", messagingSenderId: "230951536531", appId: "1:230951536531:web:da7987332bb95b08554a66" };
+        const firebaseConfig = { apiKey: "${{ secrets.Google_API}}", authDomain: "gameboxarmindo.firebaseapp.com", projectId: "gameboxarmindo", storageBucket: "gameboxarmindo.appspot.com", messagingSenderId: "230951536531", appId: "1:230951536531:web:da7987332bb95b08554a66" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
