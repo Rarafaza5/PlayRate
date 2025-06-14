@@ -125,7 +125,7 @@
     import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
     const firebaseConfig = {
-        apiKey: "${{vars.GOOGLE_API}}",
+        apiKey: "%%GOOGLE_API%%",
         authDomain: "gameboxarmindo.firebaseapp.com",
         projectId: "gameboxarmindo",
         storageBucket: "gameboxarmindo.appspot.com",
@@ -136,7 +136,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const RAWG_API_KEY = '${{ secrets.RAWG_API}}';
+    const RAWG_API_KEY = '%%RAWG_API%%';
     const RAWG_BASE_URL = 'https://api.rawg.io/api';
     let userSettings = { showNsfw: false }; 
 
