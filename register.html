@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Criar Conta - PlayRate</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg"></script>
+    <style>
+        :root {
+            --primary-color: #9f5dff;
+            --primary-hover: #8e4ce6;
+            --danger-color: #ff5566;
+            --dark-bg: #101016;
+            --medium-bg: #1c1c24;
+            --light-bg: #2a2a36;
+            --text-color: #f0f0f5;
+            --text-muted: #a0a0b0;
+            --border-color: #383844;
+            --success-color: #28a745;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #verification-message {
+            display: none;
+        }
+
+        .register-card h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .register-card p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(159, 93, 255, 0.2);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .login-link {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            margin: 1.5rem 0;
+        }
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .separator:not(:empty)::before {
+            margin-right: .5em;
+        }
+        .separator:not(:empty)::after {
+            margin-left: .5em;
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: white;
+            color: #333;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .btn-google:hover {
+            background-color: #f7f7f7;
+        }
+        .btn-google svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        footer {
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .grecaptcha-badge { 
+            visibility: hidden; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="auth-card register-card" id="register-form-card">
+            <h1>Criar Conta</h1>
+            <p>Junte-se à comunidade PlayRate.</p>
+
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="username">Nome de utilizador</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Palavra-passe</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">Criar Conta</button>
+            </form>
+
+            <div class="separator"><span>OU</span></div>
+
+            <button type="button" class="btn-google" id="google-login-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571l6.19,5.238C39.999,36.686,44,31.016,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+                Continuar com o Google
+            </button>
+            
+            <p id="error-message" class="error-message"></p>
+            <div class="login-link">
+                Já tem uma conta? <a href="login.html">Iniciar Sessão</a><br><br><p>Ao clicar em "Criar Conta" aceita os <strong><a href="terms.html">Termos e Condições</a></strong> e <strong><a href="pdp.html">Politicas de Privacidade</a></strong></p>
+            </div>
+        </div>
+        
+        <div class="auth-card register-card" id="verification-message" style="display: none;">
+             <h1>Verifique o seu Email</h1>
+             <p>Enviámos um link de verificação para o seu endereço de email. Por favor, verifique a sua caixa de entrada (e a pasta de spam) para ativar a sua conta.</p>
+             <button class="btn-submit" id="resend-verification-btn">Reenviar Email</button>
+             <div class="login-link">
+                <a href="login.html">Voltar para o Login</a>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+            Este site é protegido por reCAPTCHA e aplicam-se a 
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a> e os
+            <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos de Serviço</a> da Google.
+        </p>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent-banner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--medium-bg); color: var(--text-color); padding: 1.5rem; text-align: center; z-index: 5000; border-top: 1px solid var(--border-color);">
+        <p style="margin: 0 0 1rem; font-size: 0.9rem;">Este site utiliza cookies para garantir a melhor experiência. Ao continuar a navegar, concorda com a nossa <a href="/terms.html" style="color: var(--primary-color);">Política de Cookies e Termos de Serviço</a>.</p>
+        <div class="cookie-actions">
+            <button id="decline-cookies-btn" style="background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; margin-right: 1rem;">Recusar</button>
+            <button id="accept-cookies-btn" style="background-color: var(--primary-color); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">Aceitar</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, fetchSignInMethodsForEmail, signInWithEmailAndPassword, linkWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAjpyAqo4ISrUUuLrUpNwF13ZLl5Nvz3T4", authDomain: "gameboxarmindo.firebaseapp.com", projectId: "gameboxarmindo", storageBucket: "gameboxarmindo.appspot.com", messagingSenderId: "230951536531", appId: "1:230951536531:web:da7987332bb95b08554a66" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const registerForm = document.getElementById('register-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMessage = document.getElementById('error-message');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        
+        const registerCard = document.getElementById('register-form-card');
+        const verificationMessageCard = document.getElementById('verification-message');
+        const resendVerificationBtn = document.getElementById('resend-verification-btn');
+
+        let lastSentUser = null;
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            grecaptcha.enterprise.ready(async () => {
+                const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'SIGNUP'});
+                
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'A criar...';
+                errorMessage.style.display = 'none';
+
+                try {
+                    const usersRef = collection(db, "users");
+                    const q = query(usersRef, where("username", "==", username));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        throw { code: 'auth/username-already-in-use' };
+                    }
+
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    await sendEmailVerification(user);
+                    lastSentUser = user;
+
+                    const userDocRef = doc(db, "users", user.uid);
+                    await setDoc(userDocRef, {
+                        username: username,
+                        email: user.email,
+                        uid: user.uid,
+                        createdAt: new Date(),
+                        showNsfw: false,
+                        isPrivate: false,
+                        emailNotifications: true,
+                        accountStatus: 'active'
+                    });
+
+                    registerCard.style.display = 'none';
+                    verificationMessageCard.style.display = 'block';
+
+                } catch (error) {
+                    console.error("Erro no registo:", error);
+                    let friendlyMessage = "Ocorreu um erro ao criar a conta. Tente novamente.";
+                    if (error.code === 'auth/username-already-in-use') {
+                        friendlyMessage = "Este nome de utilizador já está a ser utilizado.";
+                    } else if (error.code === 'auth/email-already-in-use') {
+                        friendlyMessage = "Este endereço de email já está a ser utilizado.";
+                    } else if (error.code === 'auth/weak-password') {
+                        friendlyMessage = "A palavra-passe deve ter pelo menos 6 caracteres.";
+                    } else if (error.code === 'auth/invalid-email') {
+                        friendlyMessage = "O endereço de email introduzido não é válido.";
+                    }
+                    errorMessage.textContent = friendlyMessage;
+                    errorMessage.style.display = 'block';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Criar Conta';
+                }
+            });
+        });
+
+        googleLoginBtn.addEventListener('click', () => {
+             grecaptcha.enterprise.ready(async () => {
+                const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'SIGNUP_GOOGLE'});
+                
+                const provider = new GoogleAuthProvider();
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    const user = result.user;
+                    const additionalUserInfo = getAdditionalUserInfo(result);
+
+                    if (additionalUserInfo.isNewUser) {
+                        const userDocRef = doc(db, "users", user.uid);
+                        await setDoc(userDocRef, {
+                            username: user.displayName || user.email.split('@')[0],
+                            email: user.email,
+                            uid: user.uid,
+                            createdAt: new Date(),
+                            showNsfw: false,
+                            isPrivate: false,
+                            emailNotifications: true,
+                            accountStatus: 'active'
+                        });
+                    }
+                    
+                    window.location.href = new URL('index.html', window.location.href).href;
+
+                } catch (error) {
+                    if (error.code === 'auth/account-exists-with-different-credential') {
+                        const email = error.customData.email;
+                        const pendingCred = GoogleAuthProvider.credentialFromError(error);
+
+                        const methods = await fetchSignInMethodsForEmail(auth, email);
+                        if (methods[0] === 'password') {
+                            const password = prompt(`Já existe uma conta com o email ${email}. Por favor, insira a sua palavra-passe para ligar a sua conta Google.`);
+                            if (password) {
+                                try {
+                                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                                    await linkWithCredential(userCredential.user, pendingCred);
+                                    window.location.href = new URL('index.html', window.location.href).href;
+                                } catch (linkError) {
+                                    console.error("Erro ao ligar contas:", linkError);
+                                    errorMessage.textContent = "Palavra-passe incorreta ou ocorreu um erro ao ligar as contas.";
+                                    errorMessage.style.display = 'block';
+                                }
+                            }
+                            return; 
+                        }
+                    }
+                    
+                    console.error("Erro no login com Google:", error);
+                    if (error.code !== 'auth/popup-closed-by-user') {
+                        errorMessage.textContent = "Ocorreu um erro ao fazer login com o Google.";
+                        errorMessage.style.display = 'block';
+                    }
+                }
+            });
+        });
+
+        resendVerificationBtn.addEventListener('click', async () => {
+            if (!lastSentUser) return;
+            resendVerificationBtn.disabled = true;
+            resendVerificationBtn.textContent = 'A reenviar...';
+            try {
+                await sendEmailVerification(lastSentUser);
+                setTimeout(() => {
+                    resendVerificationBtn.disabled = false;
+                    resendVerificationBtn.textContent = 'Reenviar Email';
+                }, 5000);
+            } catch (error) {
+                console.error("Erro ao reenviar email:", error);
+                resendVerificationBtn.disabled = false;
+                resendVerificationBtn.textContent = 'Reenviar Email';
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const banner = document.getElementById('cookie-consent-banner');
+            const acceptBtn = document.getElementById('accept-cookies-btn');
+            const declineBtn = document.getElementById('decline-cookies-btn');
+
+            if (!localStorage.getItem('cookies_consent')) {
+                banner.style.display = 'block';
+            }
+
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem('cookies_consent', 'accepted');
+                banner.style.display = 'none';
+            });
+            
+            declineBtn.addEventListener('click', () => {
+                localStorage.setItem('cookies_consent', 'declined');
+                banner.style.display = 'none';
+            });
+        });
+
+    </script>
+</body>
+</html>

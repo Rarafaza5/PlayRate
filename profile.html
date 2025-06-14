@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Perfil - PlayRate</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg"></script>
+  <style>
+    /* --- Variáveis Globais e Reset --- */
+    :root {
+        --primary-color: #9f5dff;
+        --primary-hover: #b37eff; /* Cor de hover um pouco mais clara */
+        --dark-bg: #101016;
+        --medium-bg: #1c1c24;
+        --light-bg: #2a2a36;
+        --text-color: #f0f0f5;
+        --text-muted: #a0a0b0;
+        --border-color: #383844;
+        --shadow-color-light: rgba(0, 0, 0, 0.2);
+        --shadow-color-dark: rgba(0, 0, 0, 0.4);
+    }
+
+    /* --- Estilos Globais e Tipografia --- */
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: var(--dark-bg);
+        color: var(--text-color);
+        /* Fonte de sistema moderna para melhor legibilidade */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        margin: 0;
+        padding-top: 80px; /* Espaço para o header fixo */
+    }
+
+    h1, h2, h3, h4 {
+        font-weight: 700;
+        color: var(--text-color);
+    }
+    
+    a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    a:hover {
+        color: var(--primary-hover);
+    }
+    
+    /* Scrollbar estilizado para combinar com o tema */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--light-bg);
+        border-radius: 20px;
+        border: 3px solid var(--dark-bg);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--primary-color);
+    }
+
+
+    /* --- Header Fixo com Efeito Glassmorphism --- */
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        /* Efeito de vidro fosco */
+        background-color: rgba(16, 16, 22, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 0 2rem;
+    }
+    .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 70px;
+    }
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 800;
+        cursor: pointer;
+    }
+    header nav {
+        display: flex;
+        gap: 1.5rem;
+    }
+    header nav a {
+        font-weight: 600;
+        color: var(--text-muted);
+        position: relative;
+        padding: 0.5rem 0;
+    }
+    header nav a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--primary-color);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.3s ease;
+    }
+    header nav a:hover {
+        color: var(--text-color);
+    }
+    header nav a:hover::after {
+        transform: scaleX(1);
+    }
+
+
+    /* --- Layout Principal --- */
+    main { 
+        max-width: 960px; 
+        margin: 2rem auto 4rem; 
+        padding: 0 1rem; 
+    }
+    .loading-message, .error-message { 
+        text-align: center; 
+        margin-top: 4rem; 
+        font-size: 1.2rem; 
+        color: var(--text-muted); 
+    }
+
+    /* --- Cartões e Secções com Sombra --- */
+    .profile-card {
+        background-color: var(--medium-bg);
+        border-radius: 12px;
+        /* Substituindo a borda por uma sombra subtil para dar profundidade */
+        border: none;
+        box-shadow: 0 8px 24px var(--shadow-color-light);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .profile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px var(--shadow-color-dark);
+    }
+
+
+    /* --- Perfil --- */
+    .profile-header {
+        height: 280px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        box-shadow: inset 0 -80px 80px -40px var(--dark-bg); /* Sombra interna para fundir com o avatar */
+    }
+    
+    .profile-info-card {
+        padding: 1rem 2rem 2rem;
+        margin-top: -100px;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        gap: 1.5rem;
+    }
+    .profile-avatar {
+        font-size: 6rem;
+        width: 160px;
+        height: 160px;
+        line-height: 160px;
+        text-align: center;
+        background-color: var(--dark-bg);
+        border: 5px solid var(--medium-bg); /* Borda da cor do fundo do cartão */
+        outline: 3px solid var(--primary-color); /* Contorno da cor primária */
+        border-radius: 50%;
+        box-shadow: 0 5px 20px var(--shadow-color-dark);
+        transition: transform 0.3s ease;
+    }
+    .profile-avatar:hover {
+        transform: scale(1.05) rotate(5deg);
+    }
+    .profile-details { flex-grow: 1; padding-bottom: 10px; }
+    .profile-details h2 { 
+        font-size: 2.2rem; 
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 2px 5px var(--shadow-color-dark);
+    }
+    .profile-details .username { 
+        color: var(--text-muted); 
+        margin: 0.2rem 0 1rem;
+        text-shadow: 0 2px 5px var(--shadow-color-dark);
+    }
+    .follow-stats { 
+        display: flex; 
+        gap: 1.5rem;
+    }
+    .follow-stats span { cursor: pointer; transition: color .2s ease; font-weight: 600; }
+    .follow-stats span:hover { color: var(--primary-color); }
+    .follow-stats strong { color: var(--text-color); }
+
+    .action-button-container { margin-left: auto; align-self: center;}
+
+
+    /* --- Botões Melhorados --- */
+    .btn { 
+        padding: 0.8rem 1.5rem; 
+        border-radius: 50px; /* Bordas mais arredondadas */
+        font-weight: 700; 
+        cursor: pointer; 
+        transition: all 0.2s ease-in-out; 
+        border: 2px solid transparent;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px var(--shadow-color-light);
+    }
+    .btn-follow.following { 
+        background-color: var(--light-bg); 
+        color: var(--text-color); 
+        border-color: var(--border-color); 
+    }
+    .btn-follow.following:hover {
+        background-color: #ff4d4d; /* Vermelho para indicar "deixar de seguir" */
+        border-color: #ff4d4d;
+        color: #fff;
+    }
+    .btn-follow.not-following { 
+        background-color: var(--primary-color); 
+        color: #fff; 
+        border-color: var(--primary-color); 
+    }
+    .btn-follow.not-following:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+    }
+    .btn-edit-profile {
+        background-color: transparent; 
+        color: var(--text-color); 
+        border: 2px solid var(--border-color); 
+    }
+    .btn-edit-profile:hover {
+        background-color: var(--light-bg);
+        border-color: var(--light-bg);
+    }
+
+
+    /* --- Secção de Biografia e Tabs --- */
+    .bio-section {
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    .bio-section h3 { margin-top: 0; color: var(--primary-color); }
+    .bio-section p { color: var(--text-muted); line-height: 1.6; }
+
+    .profile-main-content { 
+        margin-top: 2rem; 
+        overflow: hidden;
+    }
+    .tabs { 
+        display: flex; 
+        background-color: var(--light-bg); 
+        border-bottom: 1px solid var(--border-color); 
+    }
+    .tab-btn { 
+        flex: 1; 
+        padding: 1rem; 
+        background: none; 
+        border: none; 
+        color: var(--text-muted); 
+        font-size: 1rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        border-bottom: 3px solid transparent; 
+        transition: all 0.2s ease; 
+        position: relative;
+    }
+    .tab-btn.active { 
+        color: var(--primary-color); 
+        border-bottom-color: var(--primary-color); 
+    }
+    .tab-btn:hover:not(.active) {
+        color: var(--text-color);
+        background-color: rgba(255,255,255,0.05);
+    }
+    .tab-content { padding: 2rem; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; animation: fadeIn 0.5s ease; }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Feed de Atividade --- */
+    .review-feed-item { 
+        margin-bottom: 1.5rem; 
+        padding-bottom: 1.5rem; 
+        border-bottom: 1px solid var(--border-color); 
+        transition: background-color 0.2s ease;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    .review-feed-item:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    .review-feed-item:last-child { border-bottom: none; }
+    .review-game-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .review-game-header img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+    .review-game-header a { font-size: 1.2rem; font-weight: 700; }
+    .review-stars { color: gold; margin-bottom: 0.5rem; }
+
+
+    /* --- Carousel de Jogos Favoritos Melhorado --- */
+    .row-carousel-container { position: relative; }
+    .row-carousel-wrapper { 
+        overflow-x: scroll; 
+        scrollbar-width: none; 
+        -ms-overflow-style: none; 
+        padding: 1rem 0.5rem; /* Adicionado padding para o brilho não ser cortado */
+        margin: 0 -0.5rem; /* Compensa o padding */
+        scroll-snap-type: x mandatory;
+    }
+    .row-carousel-wrapper::-webkit-scrollbar { display: none; }
+    #favorite-games-grid.game-grid { 
+        display: flex; 
+        flex-wrap: nowrap; 
+        gap: 1.5rem; 
+    }
+
+    /* O CARD DO JOGO - Onde a magia acontece */
+    #favorite-games-grid .game-item { 
+        flex: 0 0 200px; 
+        width: 200px;
+        height: 270px; /* Altura fixa para consistência */
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 10px var(--shadow-color-light);
+        scroll-snap-align: start;
+        /* Transição mais sofisticada para todos os elementos */
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    #favorite-games-grid .game-item:hover {
+        /* 1. Efeito de Levitação e Brilho Néon */
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.25), /* Sombra mais pronunciada */
+                    0 0 20px -5px var(--primary-color); /* Brilho néon roxo */
+    }
+
+    /* Link que envolve todo o card */
+    .game-item .game-link {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+    }
+
+    .game-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    #favorite-games-grid .game-item:hover img {
+        /* 2. Efeito de Paralaxe na Imagem */
+        transform: scale(1.15);
+    }
+
+    .game-item .game-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
+        /* Gradiente mais forte para garantir a legibilidade */
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 20%, rgba(0,0,0,0.7) 60%, transparent);
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* Título do jogo */
+    .game-item h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #fff;
+        text-shadow: 0 2px 4px #000;
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    #favorite-games-grid .game-item:hover h3 {
+        /* Move o título para cima no hover */
+        transform: translateY(-16px);
+    }
+
+    /* 3. Overlay de Informação Dinâmico (Call to action) */
+    .game-item .game-info::after {
+        content: 'Ver Jogo →';
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+        opacity: 0; /* Começa invisível */
+        transform: translateY(5px); /* Começa ligeiramente abaixo */
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition-delay: 0.05s; /* Pequeno atraso para entrar depois do título */
+    }
+
+    #favorite-games-grid .game-item:hover .game-info::after {
+        opacity: 1; /* Torna-se visível */
+        transform: translateY(0); /* Move para a posição final */
+    }
+
+    /* Botão de remover (se existir) */
+    .game-item .remove-fav-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 20;
+        background-color: rgba(16, 16, 22, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+        line-height: 28px;
+        text-align: center;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: all 0.2s ease;
+    }
+    .game-item .remove-fav-btn:hover {
+        background-color: #ff4d4d;
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    
+    .row-carousel-btn { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        z-index: 10; 
+        background: var(--medium-bg); 
+        color: var(--text-color); 
+        border: 1px solid var(--border-color); 
+        border-radius: 50%; 
+        width: 45px; height: 45px; 
+        font-size: 1.5rem; 
+        cursor: pointer; 
+        opacity: 0; 
+        visibility: hidden; 
+        transition: all 0.25s ease; 
+        box-shadow: 0 4px 10px var(--shadow-color-dark);
+    }
+    .row-carousel-container:hover .row-carousel-btn { opacity: 1; visibility: visible; }
+    .row-carousel-btn:hover { background-color: var(--primary-color); border-color: var(--primary-color); }
+    .row-carousel-btn.prev { left: -22px; }
+    .row-carousel-btn.next { right: -22px; }
+
+
+    /* --- Modals e Formulários --- */
+    .modal-overlay { 
+        position: fixed; inset: 0; 
+        background: rgba(16, 16, 22, 0.8); 
+        backdrop-filter: blur(8px); 
+        display: none; align-items: center; justify-content: center; 
+        z-index: 2000; 
+        opacity: 0; 
+        transition: opacity 0.3s ease-out; 
+    }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-overlay.active .modal-card {
+        animation: modal-pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes modal-pop-in {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    
+    .modal-card { 
+        background: var(--medium-bg); 
+        padding: 2rem; 
+        border-radius: 16px; 
+        border: 1px solid var(--border-color); 
+        width: 90%; max-width: 600px;
+        box-shadow: 0 10px 40px var(--shadow-color-dark);
+    }
+    
+    /* Melhoria dos campos de formulário */
+    .form-group input, .form-group textarea { 
+        width: 100%; 
+        background-color: var(--light-bg); 
+        border: 2px solid var(--border-color); 
+        color: var(--text-color); 
+        border-radius: 8px; 
+        padding: 0.8rem 1rem; 
+        font-size: 1rem; 
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(159, 93, 255, 0.3);
+    }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+
+    /* Botões dentro do Modal */
+    .modal-actions {
+        display: flex; 
+        justify-content: flex-end; 
+        gap: 1rem; 
+        margin-top: 2rem; 
+    }
+    .btn-secondary { background-color: transparent; color: var(--text-muted); border: 2px solid var(--border-color); }
+    .btn-secondary:hover { background-color: var(--light-bg); color: var(--text-color); }
+    .btn-primary { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    .btn-primary:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); }
+    
+    /* --- Restante dos Estilos (sem grandes alterações) --- */
+    .private-profile-view { background-color: var(--medium-bg); padding: 4rem 2rem; border-radius: 12px; text-align: center; border: 1px solid var(--border-color); }
+    .private-profile-view .icon { font-size: 4rem; }
+    .private-profile-view h2 { margin-top: 1rem; }
+    .user-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+    .user-list-item { display: flex; align-items: center; gap: 1rem; background-color: var(--light-bg); padding: 1rem; border-radius: 8px; text-decoration: none; color: var(--text-color); transition: background-color .2s ease, transform 0.2s ease; }
+    .user-list-item:hover { background-color: #3a3a4a; transform: translateY(-2px); }
+    .user-list-avatar { font-size: 2.5rem; width: 50px; height: 50px; display: grid; place-content: center; border-radius: 50%; background-color: var(--medium-bg); }
+    .user-list-info h4 { margin: 0; }
+    .user-list-info p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+    .user-list-modal { max-height: 60vh; overflow-y: auto; margin-top: 1.5rem; padding-right: 1rem; }
+    #edit-profile-modal .modal-card { max-width: 700px; }
+    #edit-profile-form { display: grid; grid-template-columns: 200px 1fr; gap: 2rem; }
+    .edit-col-1 { text-align: center; }
+    .edit-col-2 { text-align: left; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted); }
+    #avatar-preview { font-size: 5rem; width: 120px; height: 120px; border-radius: 50%; background: var(--light-bg); margin: 0 auto 1rem; display: grid; place-content: center; cursor: pointer; }
+    .emoji-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 0.5rem; max-height: 150px; overflow-y: auto; background-color: var(--dark-bg); padding: 0.5rem; border-radius: 8px; margin-top: 0.5rem; border: 1px solid var(--border-color); }
+    .emoji-picker span { text-align: center; font-size: 1.8rem; cursor: pointer; padding: 0.2rem; border-radius: 6px; transition: background-color 0.2s ease; }
+    .emoji-picker span:hover, .emoji-picker span.selected { background-color: var(--primary-color); }
+    #banner-preview { width: 100%; height: 100px; border-radius: 8px; background-color: var(--light-bg); margin-bottom: 1rem; background-size: cover; background-position: center; cursor: pointer;}
+    .color-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+    .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s ease; }
+    .color-swatch.selected { border-color: var(--primary-color); transform: scale(1.1); }
+    #banner-color-input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .modal-actions { grid-column: 1 / -1; }
+
+    @media (max-width: 768px) {
+        body { padding-top: 60px; }
+        header { padding: 0 1rem; }
+        .header-content { height: 60px; }
+        .profile-info-card { flex-direction: column; align-items: center; text-align: center; margin-top: -80px; }
+        .profile-avatar { width: 120px; height: 120px; line-height: 120px; font-size: 4rem; }
+        .action-button-container { margin-left: 0; margin-top: 1rem; width: 100%; display: flex; justify-content: center; }
+        #edit-profile-form { grid-template-columns: 1fr; }
+    }
+    
+    .grecaptcha-badge { visibility: hidden; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="logo" onclick="window.location.href='index.html'">PlayRate</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="settings.html" id="settingsLink" style="display: none;">Configurações</a>
+            <a href="#" id="logoutLink" style="display: none;">Sair</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div id="loading" class="loading-message">A carregar perfil...</div>
+    <div id="profile-content" style="display: none;">
+        <div id="profile-header" class="profile-header"></div>
+        
+        <div class="profile-info-card">
+            <div class="profile-avatar-container">
+                <div id="profile-avatar" class="profile-avatar"></div>
+            </div>
+            <div class="profile-details">
+                <h2 id="profile-displayName"></h2>
+                <p id="profile-username" class="username"></p>
+                <div id="follow-stats" class="follow-stats"></div>
+            </div>
+            <div class="action-button-container">
+                <button id="profile-action-btn" class="btn" style="display: none;"></button>
+            </div>
+        </div>
+
+        <div id="bio-section" class="profile-card bio-section">
+            <h3>Sobre Mim</h3>
+            <p id="bio-text"></p>
+        </div>
+
+        <div class="profile-card profile-main-content">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="favorites">Jogos Favoritos</button>
+                <button class="tab-btn" data-tab="activity">Atividade</button>
+            </div>
+            <div class="tab-content">
+                <div id="favorites-pane" class="tab-pane active">
+                    <div class="row-carousel-container">
+                        <button class="row-carousel-btn prev">&#10094;</button>
+                        <div class="row-carousel-wrapper">
+                            <div id="favorite-games-grid" class="game-grid"></div>
+                        </div>
+                        <button class="row-carousel-btn next">&#10095;</button>
+                    </div>
+                    <button id="add-favorite-game-btn" class="btn" style="display: none; width: 100%; margin-top: 1rem;">Adicionar Jogo</button>
+                </div>
+                <div id="activity-pane" class="tab-pane">
+                    <div id="review-feed"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="private-profile-view" class="private-profile-view" style="display: none;">
+        <div class="icon">🔒</div>
+        <h2>Este Perfil é Privado</h2>
+        <p>Apenas seguidores podem ver os detalhes e a atividade deste utilizador.</p>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; <span id="copyright-year"></span> PlayRate. Todos os direitos reservados.</p>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+        Este site é protegido por reCAPTCHA e aplicam-se a 
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a> e os
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos de Serviço</a> da Google.
+    </p>
+</footer>
+
+<div id="edit-profile-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>Editar Perfil</h3>
+        <form id="edit-profile-form">
+            <div class="edit-col-1">
+                <div class="form-group">
+                    <label for="emoji-picker">Avatar</label>
+                    <div id="avatar-preview" title="Clique para escolher um emoji"></div>
+                    <div id="emoji-picker" class="emoji-picker" style="display: none;"></div>
+                </div>
+                 <div class="form-group">
+                    <label for="banner-color-input">Cor do Banner</label>
+                    <div id="banner-preview" title="Clique para escolher uma cor"></div>
+                    <div id="banner-color-picker" class="color-picker" style="display: none;"></div>
+                    <input type="color" id="banner-color-input">
+                </div>
+            </div>
+            <div class="edit-col-2">
+                 <div class="form-group">
+                    <label for="displayName-input">Nome de Exibição</label>
+                    <input type="text" id="displayName-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="bio-input">Biografia</label>
+                    <textarea id="bio-input" maxlength="300"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="game-search-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>Adicionar Jogo Favorito</h3>
+        <input type="text" id="game-search-input" placeholder="Pesquisar por nome do jogo..." style="width: 100%; padding: 0.8rem; font-size: 1rem;">
+        <div id="game-search-results" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;"></div>
+        <div class="modal-actions">
+            <button type="button" id="close-game-search-btn" class="btn btn-secondary">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div id="follow-list-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 id="follow-list-title"></h3>
+        <div id="follow-list-container" class="user-list-modal"></div>
+        <div class="modal-actions" style="justify-content: center;">
+            <button type="button" id="close-follow-list-btn" class="btn btn-secondary">Fechar</button>
+        </div>
+    </div>
+</div>
+
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, writeBatch, arrayRemove, arrayUnion, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // ATENÇÃO: Expor chaves de API no lado do cliente é um risco de segurança.
+    // Para um ambiente de produção, restrinja a chave na consola do Firebase (e.g., por referenciador HTTP)
+    // e considere usar um proxy ou Cloud Functions para chamadas a APIs de terceiros como a RAWG.
+    const firebaseConfig = { apiKey: "AIzaSyAjpyAqo4ISrUUuLrUpNwF13ZLl5Nvz3T4", authDomain: "gameboxarmindo.firebaseapp.com", projectId: "gameboxarmindo", storageBucket: "gameboxarmindo.appspot.com", messagingSenderId: "230951536531", appId: "1:230951536531:web:da7987332bb95b08554a66" };
+    const RAWG_API_KEY = 'a8d70ee041784cac86f005a63bcdfc0f';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loadingEl = document.getElementById('loading');
+    const profileContentEl = document.getElementById('profile-content');
+    const privateView = document.getElementById('private-profile-view');
+    const logoutLink = document.getElementById('logoutLink');
+    const settingsLink = document.getElementById('settingsLink');
+    let selectedEmoji = '';
+    let selectedBannerColor = '';
+    let targetProfileData = null; 
+    let currentAuthUser = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        currentAuthUser = user;
+        if (currentAuthUser) {
+            logoutLink.style.display = 'block';
+            settingsLink.style.display = 'block';
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        let username = params.get("user");
+
+        if (!username && currentAuthUser) {
+            const userDoc = await getDoc(doc(db, "users", currentAuthUser.uid));
+            if (userDoc.exists()) {
+                username = userDoc.data().username;
+                // Redirecionar para a URL canónica para evitar confusão
+                window.history.replaceState({}, '', `?user=${username}`);
+            }
+        }
+        
+        if (!username) {
+            window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+            return;
+        }
+        
+        const userQuery = query(collection(db, "users"), where("username", "==", username));
+        const querySnapshot = await getDocs(userQuery);
+
+        if (querySnapshot.empty) {
+            loadingEl.textContent = `Utilizador "${username}" não encontrado.`;
+            return;
+        }
+
+        const targetUserDoc = querySnapshot.docs[0];
+        targetProfileData = { id: targetUserDoc.id, ...targetUserDoc.data() };
+        
+        const isOwnProfile = currentAuthUser && currentAuthUser.uid === targetProfileData.id;
+
+        let canViewProfile = !targetProfileData.isPrivate || isOwnProfile;
+        // CORREÇÃO: A lógica para ver perfis privados foi corrigida.
+        // Um utilizador pode ver um perfil privado se ele for um seguidor desse perfil.
+        if (targetProfileData.isPrivate && !isOwnProfile && currentAuthUser) {
+            const visitorIsFollower = (targetProfileData.followers || []).includes(currentAuthUser.uid);
+            if (visitorIsFollower) canViewProfile = true;
+        }
+        
+        loadingEl.style.display = 'none';
+        if (canViewProfile) {
+            profileContentEl.style.display = 'block';
+            privateView.style.display = 'none';
+            renderFullProfile(targetProfileData, currentAuthUser, isOwnProfile);
+            fetchAndDisplayReviews(targetProfileData.id);
+        } else {
+            privateView.style.display = 'block';
+            profileContentEl.style.display = 'none';
+        }
+    });
+
+    function updateFollowStatsUI() {
+        const followersCount = targetProfileData.followers?.length || 0;
+        const followingCount = targetProfileData.following?.length || 0;
+        document.getElementById('follow-stats').innerHTML = `<span id="followers-stat"><strong>${followersCount}</strong> Seguidores</span> | <span id="following-stat"><strong>${followingCount}</strong> Seguindo</span>`;
+        // Re-adicionar os event listeners pois o innerHTML foi substituído
+        document.getElementById('followers-stat').addEventListener('click', () => openFollowModal('followers'));
+        document.getElementById('following-stat').addEventListener('click', () => openFollowModal('following'));
+    }
+
+    function renderFullProfile(profileData, user, isOwnProfile) {
+        document.title = `PlayRate - ${profileData.displayName || profileData.username}`;
+        document.getElementById('profile-header').style.backgroundColor = profileData.bannerColor || 'var(--light-bg)';
+        document.getElementById('profile-avatar').textContent = profileData.emojiProfile || '👤';
+        document.getElementById('profile-displayName').textContent = profileData.displayName || profileData.username;
+        document.getElementById('profile-username').textContent = `@${profileData.username}`;
+        document.getElementById('bio-text').textContent = profileData.bio || 'Este utilizador prefere manter o mistério.';
+
+        updateFollowStatsUI();
+        
+        const actionBtn = document.getElementById('profile-action-btn');
+        if (isOwnProfile) {
+            actionBtn.textContent = 'Editar Perfil';
+            actionBtn.className = 'btn btn-edit-profile';
+            actionBtn.style.display = 'block';
+            actionBtn.onclick = () => openEditModal(profileData);
+        } else if (user) {
+            // IMPLEMENTADO: Lógica do botão Seguir/Deixar de Seguir
+            const isFollowing = (user.following || []).includes(profileData.id);
+            actionBtn.textContent = isFollowing ? 'A Seguir' : 'Seguir';
+            actionBtn.className = `btn btn-follow ${isFollowing ? 'following' : 'not-following'}`;
+            actionBtn.style.display = 'block';
+            actionBtn.onclick = () => toggleFollow(user, profileData);
+        } else {
+            actionBtn.style.display = 'none';
+        }
+        
+        renderFavoriteGames(profileData.favoriteGames || [], isOwnProfile);
+
+        const addGameBtn = document.getElementById('add-favorite-game-btn');
+        if (isOwnProfile) {
+            addGameBtn.style.display = 'block';
+            addGameBtn.onclick = () => document.getElementById('game-search-modal').classList.add('active');
+        } else {
+            addGameBtn.style.display = 'none';
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.addEventListener('click', () => showTab(tab.dataset.tab));
+        });
+    }
+
+    async function toggleFollow(currentUserData, targetUserData) {
+        if (!currentAuthUser) {
+            alert("Precisa de estar autenticado para seguir utilizadores.");
+            return;
+        }
+
+        const actionBtn = document.getElementById('profile-action-btn');
+        actionBtn.disabled = true; // Prevenir cliques duplos
+
+        const currentUserRef = doc(db, "users", currentAuthUser.uid);
+        const targetUserRef = doc(db, "users", targetUserData.id);
+
+        const batch = writeBatch(db);
+        const amIFollowing = (targetProfileData.followers || []).includes(currentAuthUser.uid);
+
+        if (amIFollowing) {
+            // Deixar de Seguir
+            batch.update(currentUserRef, { following: arrayRemove(targetUserData.id) });
+            batch.update(targetUserRef, { followers: arrayRemove(currentAuthUser.uid) });
+        } else {
+            // Seguir
+            batch.update(currentUserRef, { following: arrayUnion(targetUserData.id) });
+            batch.update(targetUserRef, { followers: arrayUnion(currentAuthUser.uid) });
+        }
+
+        try {
+            await batch.commit();
+            // Atualizar UI localmente para uma resposta imediata
+            if (amIFollowing) {
+                targetProfileData.followers = targetProfileData.followers.filter(id => id !== currentAuthUser.uid);
+                actionBtn.textContent = 'Seguir';
+                actionBtn.className = 'btn btn-follow not-following';
+            } else {
+                targetProfileData.followers = [...(targetProfileData.followers || []), currentAuthUser.uid];
+                actionBtn.textContent = 'A Seguir';
+                actionBtn.className = 'btn btn-follow following';
+            }
+            updateFollowStatsUI();
+        } catch (error) {
+            console.error("Erro ao seguir/deixar de seguir:", error);
+            alert("Ocorreu um erro. Tente novamente.");
+        } finally {
+            actionBtn.disabled = false;
+        }
+    }
+
+
+    function showTab(tabId) {
+        document.querySelector('.tab-btn.active')?.classList.remove('active');
+        document.querySelector('.tab-pane.active')?.classList.remove('active');
+        
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(`${tabId}-pane`).classList.add('active');
+    }
+
+    async function openFollowModal(type) {
+        const modal = document.getElementById('follow-list-modal');
+        const titleEl = document.getElementById('follow-list-title');
+        const containerEl = document.getElementById('follow-list-container');
+        
+        titleEl.textContent = type === 'followers' ? 'Seguidores' : 'Seguindo';
+        const userIdList = targetProfileData[type] || [];
+        
+        document.getElementById('close-follow-list-btn').onclick = () => modal.classList.remove('active');
+
+        await renderUserList(containerEl, userIdList, type === 'followers' ? "Nenhum seguidor." : "Não segue ninguém.");
+        
+        modal.classList.add('active');
+    }
+
+    async function renderUserList(container, userIdList, emptyMessage) {
+        container.innerHTML = '<p class="text-muted">A carregar...</p>';
+        if (userIdList.length === 0) {
+            container.innerHTML = `<p class="text-muted">${emptyMessage}</p>`;
+            return;
+        }
+
+        // Firestore limita 'in' a 30 itens por consulta. Se a lista for grande, precisará de paginação.
+        const userPromises = userIdList.slice(0, 30).map(id => getDoc(doc(db, "users", id)));
+        const userSnapshots = await Promise.all(userPromises);
+        
+        container.innerHTML = '';
+        userSnapshots.forEach(snap => {
+            if (snap.exists()) {
+                const userData = snap.data();
+                const userEl = document.createElement('a');
+                userEl.className = 'user-list-item';
+                userEl.href = `profile.html?user=${userData.username}`;
+                userEl.innerHTML = `
+                    <div class="user-list-avatar">${userData.emojiProfile || '👤'}</div>
+                    <div class="user-list-info">
+                        <h4>${userData.displayName || userData.username}</h4>
+                        <p>@${userData.username}</p>
+                    </div>
+                `;
+                container.appendChild(userEl);
+            }
+        });
+    }
+
+    // CORRIGIDO: Função refatorada para maior clareza e segurança
+    function renderFavoriteGames(games, isOwnProfile) {
+        const favGamesGrid = document.getElementById('favorite-games-grid');
+        favGamesGrid.innerHTML = '';
+        if (games.length > 0) {
+            games.forEach(game => {
+                const gameEl = document.createElement('div');
+                gameEl.className = 'game-item';
+                gameEl.innerHTML = `
+                    <a href="game-details.html?id=${game.id}" class="game-link">
+                        <img src="${game.backgroundImage || ''}" alt="${game.name}" loading="lazy">
+                        <div class="game-info"><h3>${game.name}</h3></div>
+                    </a>
+                    ${isOwnProfile ? `<button class="remove-fav-btn" title="Remover dos Favoritos">&times;</button>` : ''}
+                `;
+
+                if (isOwnProfile) {
+                    const removeBtn = gameEl.querySelector('.remove-fav-btn');
+                    if (removeBtn) {
+                        removeBtn.onclick = (e) => {
+                            e.preventDefault(); // Evita que o link 'a' seja acionado
+                            e.stopPropagation();
+                            removeFavoriteGame(game);
+                        };
+                    }
+                }
+                favGamesGrid.appendChild(gameEl);
+            });
+        } else {
+            favGamesGrid.innerHTML = '<p class="text-muted">Nenhum jogo favorito adicionado.</p>';
+        }
+
+        const section = favGamesGrid.closest('#favorites-pane');
+        if (section) {
+            initializeRowCarousel(section);
+        }
+    }
+
+
+    async function removeFavoriteGame(gameToRemove) {
+        if (!auth.currentUser) return;
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        
+        try {
+            await updateDoc(userDocRef, { favoriteGames: arrayRemove(gameToRemove) });
+            targetProfileData.favoriteGames = targetProfileData.favoriteGames.filter(g => g.id !== gameToRemove.id);
+            renderFavoriteGames(targetProfileData.favoriteGames, true);
+        } catch (error) {
+            console.error("Erro ao remover jogo favorito:", error);
+            alert("Não foi possível remover o jogo. Tente novamente.");
+        }
+    }
+
+    async function fetchAndDisplayReviews(userId) {
+        const feedContainer = document.getElementById('review-feed');
+        feedContainer.innerHTML = '<p class="text-muted">A carregar atividade...</p>';
+        
+        const reviewsQuery = query(collection(db, "reviews"), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(10));
+        const querySnapshot = await getDocs(reviewsQuery);
+
+        if (querySnapshot.empty) {
+            feedContainer.innerHTML = '<p class="text-muted">Nenhuma atividade recente.</p>';
+            return;
+        }
+
+        const reviews = querySnapshot.docs.map(doc => doc.data());
+
+        feedContainer.innerHTML = '';
+        reviews.forEach(review => {
+            const rating = review.rating || 0;
+            const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+            const reviewEl = document.createElement('div');
+            reviewEl.className = 'review-feed-item';
+            
+            const gameName = review.gameName || 'Jogo Desconhecido';
+            const gameNameInitial = gameName ? gameName.charAt(0).toUpperCase() : '?';
+            const imageUrl = review.gameImage || `https://placehold.co/50x50/2a2a36/f0f0f5?text=${gameNameInitial}`;
+            
+            reviewEl.innerHTML = `
+                <div class="review-game-header">
+                    <img src="${imageUrl}" alt="${gameName}" onerror="this.onerror=null;this.src='https://placehold.co/50x50/2a2a36/f0f0f5?text=Err';">
+                    <a href="game-details.html?id=${review.gameId}">${gameName}</a>
+                </div>
+                <div class="review-stars">${stars}</div>
+                <p class="review-comment-text">${review.comment || '<i>O utilizador não deixou um comentário.</i>'}</p>
+            `;
+            feedContainer.appendChild(reviewEl);
+        });
+    }
+
+    // O resto do seu JavaScript para modals, pesquisa, etc., continua aqui...
+    // Nenhuma alteração crítica foi necessária nessas partes.
+    function openEditModal(profileData) {
+        const modal = document.getElementById('edit-profile-modal');
+        const emojiPicker = document.getElementById('emoji-picker');
+        const bannerColorPicker = document.getElementById('banner-color-picker');
+        const avatarPreview = document.getElementById('avatar-preview');
+        const bannerPreview = document.getElementById('banner-preview');
+        
+        document.getElementById('displayName-input').value = profileData.displayName || profileData.username;
+        document.getElementById('bio-input').value = profileData.bio || '';
+        selectedEmoji = profileData.emojiProfile || '👤';
+        selectedBannerColor = profileData.bannerColor || 'var(--light-bg)';
+
+        avatarPreview.textContent = selectedEmoji;
+        bannerPreview.style.backgroundColor = selectedBannerColor;
+
+        avatarPreview.onclick = () => { emojiPicker.style.display = emojiPicker.style.display === 'grid' ? 'none' : 'grid'; };
+        bannerPreview.onclick = () => { bannerColorPicker.style.display = bannerColorPicker.style.display === 'flex' ? 'none' : 'flex'; };
+
+        const emojis = ["😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","💩","👻","💀","☠️","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾"];
+        emojiPicker.innerHTML = '';
+        emojis.forEach(emoji => {
+            const span = document.createElement('span');
+            span.textContent = emoji;
+            if (emoji === selectedEmoji) span.classList.add('selected');
+            span.addEventListener('click', () => {
+                emojiPicker.querySelector('.selected')?.classList.remove('selected');
+                span.classList.add('selected');
+                selectedEmoji = emoji;
+                avatarPreview.textContent = selectedEmoji;
+                emojiPicker.style.display = 'none';
+            });
+            emojiPicker.appendChild(span);
+        });
+
+        const colors = ['#1c1c24', '#2a2a36', '#9f5dff', '#00adee', '#ff5566', '#28a745', '#f4c542'];
+        bannerColorPicker.innerHTML = '';
+        colors.forEach(color => {
+            const swatch = document.createElement('div');
+            swatch.className = 'color-swatch';
+            swatch.style.backgroundColor = color;
+            if (color === selectedBannerColor) swatch.classList.add('selected');
+            swatch.addEventListener('click', () => {
+                bannerColorPicker.querySelector('.selected')?.classList.remove('selected');
+                swatch.classList.add('selected');
+                selectedBannerColor = color;
+                bannerPreview.style.backgroundColor = selectedBannerColor;
+                bannerColorPicker.style.display = 'none';
+            });
+            bannerColorPicker.appendChild(swatch);
+        });
+        
+        modal.classList.add('active');
+    }
+    
+    document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+        document.getElementById('edit-profile-modal').classList.remove('active');
+    });
+
+    document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        grecaptcha.enterprise.ready(async () => {
+            const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'EDIT_PROFILE'});
+            
+            const newDisplayName = document.getElementById('displayName-input').value.trim();
+            const newBio = document.getElementById('bio-input').value.trim();
+            
+            const updates = {
+                emojiProfile: selectedEmoji,
+                displayName: newDisplayName,
+                bio: newBio,
+                bannerColor: selectedBannerColor
+            };
+
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userDocRef, updates);
+
+            document.getElementById('edit-profile-modal').classList.remove('active');
+            window.location.reload();
+        });
+    });
+
+    const gameSearchModal = document.getElementById('game-search-modal');
+    const gameSearchInput = document.getElementById('game-search-input');
+    const gameSearchResults = document.getElementById('game-search-results');
+    document.getElementById('close-game-search-btn').addEventListener('click', () => gameSearchModal.classList.remove('active'));
+
+    let gameSearchTimeout;
+    gameSearchInput.addEventListener('input', () => {
+        clearTimeout(gameSearchTimeout);
+        gameSearchTimeout = setTimeout(() => {
+            grecaptcha.enterprise.ready(async () => {
+                const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'SEARCH_GAMES'});
+
+                const query = gameSearchInput.value.trim();
+                if (query.length < 3) {
+                    gameSearchResults.innerHTML = '';
+                    return;
+                }
+                const response = await fetch(`https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${query}&page_size=5`);
+                const data = await response.json();
+                
+                gameSearchResults.innerHTML = '';
+                data.results.forEach(game => {
+                    const resultEl = document.createElement('div');
+                    resultEl.className = 'search-result-item'; // Assumindo que tem uma classe para estilizar
+                    resultEl.style.cursor = 'pointer';
+                    resultEl.innerHTML = `<img src="${game.background_image || ''}" alt="${game.name}" style="width:50px; height: 50px; object-fit: cover; margin-right: 1rem;"> <div><h3>${game.name}</h3></div>`;
+                    resultEl.onclick = () => addFavoriteGame(game);
+                    gameSearchResults.appendChild(resultEl);
+                });
+            });
+        }, 500);
+    });
+
+    async function addFavoriteGame(game) {
+        if((targetProfileData.favoriteGames || []).length >= 10) {
+            alert("Pode adicionar um máximo de 10 jogos favoritos.");
+            return;
+        }
+
+        const gameData = {
+            id: game.id,
+            name: game.name,
+            backgroundImage: game.background_image
+        };
+        const userDocRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(userDocRef, { favoriteGames: arrayUnion(gameData) });
+        
+        gameSearchModal.classList.remove('active');
+        
+        if (!targetProfileData.favoriteGames.some(g => g.id === game.id)) {
+            targetProfileData.favoriteGames.push(gameData);
+            renderFavoriteGames(targetProfileData.favoriteGames, true);
+        }
+    }
+
+    function initializeRowCarousel(sectionElement) {
+        const wrapper = sectionElement.querySelector('.row-carousel-wrapper');
+        const prevBtn = sectionElement.querySelector('.prev');
+        const nextBtn = sectionElement.querySelector('.next');
+
+        if (!wrapper || !prevBtn || !nextBtn) return;
+
+        prevBtn.addEventListener('click', () => {
+            const scrollAmount = wrapper.clientWidth * 0.8;
+            wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            const scrollAmount = wrapper.clientWidth * 0.8;
+            wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+    }
+    
+    if (logoutLink) {
+        logoutLink.addEventListener('click', () => signOut(auth).then(() => window.location.href = 'login.html'));
+    }
+    
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+</script>
+</body>
+</html>

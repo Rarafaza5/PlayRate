@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home - PlayRate</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg"></script>
+    <style>
+        .grecaptcha-badge { 
+            visibility: hidden; 
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-content">
+        <div class="logo">PlayRate</div>
+        <nav>
+            <button id="searchToggle" class="search-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            <a href="profile.html" id="profileLink" style="display: none;">Perfil</a>
+            <a href="settings.html" id="settingsLink" style="display: none;">Definições</a>
+            <a href="#" id="logoutLink" style="display: none;">Sair</a>
+            <a href="login.html" id="loginLink">Login</a>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="carousel">
+        <div class="carousel-inner" id="carouselInner"></div>
+        <div class="carousel-caption" id="carouselCaption" style="display: none;">
+            <h1 id="carouselTitle"></h1>
+            <p id="carouselDescription"></p>
+        </div>
+        <div class="carousel-controls">
+            <button class="carousel-control-prev" id="prevSlide">&#10094;</button>
+            <button class="carousel-control-next" id="nextSlide">&#10095;</button>
+        </div>
+    </div>
+</section>
+
+<main>
+    <section class="game-row" id="featured-section">
+        <h2>Destaques da Crítica</h2>
+        <div class="row-carousel-container">
+            <button class="row-carousel-btn prev">&#10094;</button>
+            <div class="row-carousel-wrapper">
+                <div class="game-grid" id="featuredGames"></div>
+            </div>
+            <button class="row-carousel-btn next">&#10095;</button>
+        </div>
+    </section>
+
+    <section class="game-row" id="popular-section">
+        <h2>Mais Populares do Ano</h2>
+         <div class="row-carousel-container">
+            <button class="row-carousel-btn prev">&#10094;</button>
+            <div class="row-carousel-wrapper">
+                <div class="game-grid" id="popularGames"></div>
+            </div>
+            <button class="row-carousel-btn next">&#10095;</button>
+        </div>
+    </section>
+
+    <section class="game-row" id="new-releases-section">
+        <h2>Novos Lançamentos</h2>
+         <div class="row-carousel-container">
+            <button class="row-carousel-btn prev">&#10094;</button>
+            <div class="row-carousel-wrapper">
+                <div class="game-grid" id="newReleases"></div>
+            </div>
+            <button class="row-carousel-btn next">&#10095;</button>
+        </div>
+    </section>
+    
+    <section class="game-row" id="timeless-classics-section">
+        <h2>Clássicos Intemporais</h2>
+         <div class="row-carousel-container">
+            <button class="row-carousel-btn prev">&#10094;</button>
+            <div class="row-carousel-wrapper">
+                <div class="game-grid" id="timelessClassics"></div>
+            </div>
+            <button class="row-carousel-btn next">&#10095;</button>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; <span id="copyright-year"></span> PlayRate. Todos os direitos reservados. | <a href="terms.html" style="color: var(--text-muted);">Termos e Condições</a> e <a href="pdp.html" style="color: var(--text-muted);">Politicas de Privacidade</a></p><br>
+    <p>Suporte: <a href="mailto:suporte@playrate.fun" style="color: var(--text-muted);">suporte@playrate.fun</a></p>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+        Este site é protegido por reCAPTCHA e aplicam-se a 
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a> e os
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos de Serviço</a> da Google.
+    </p>
+</footer>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-container">
+        <button id="closeSearch" class="close-button"> &times; </button>
+        <input type="text" id="searchInput" placeholder="Pesquisar por jogos ou @utilizadores" />
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent-banner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--medium-bg); color: var(--text-color); padding: 1.5rem; text-align: center; z-index: 5000; border-top: 1px solid var(--border-color);">
+    <p style="margin: 0 0 1rem; font-size: 0.9rem;">Este site utiliza cookies para garantir a melhor experiência. Ao continuar a navegar, concorda com a nossa <a href="/terms.html" style="color: var(--primary-color);">Política de Cookies e Termos de Serviço</a>.</p>
+    <div class="cookie-actions">
+        <button id="decline-cookies-btn" style="background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; margin-right: 1rem;">Recusar</button>
+        <button id="accept-cookies-btn" style="background-color: var(--primary-color); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">Aceitar</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAjpyAqo4ISrUUuLrUpNwF13ZLl5Nvz3T4",
+        authDomain: "gameboxarmindo.firebaseapp.com",
+        projectId: "gameboxarmindo",
+        storageBucket: "gameboxarmindo.appspot.com",
+        messagingSenderId: "230951536531",
+        appId: "1:230951536531:web:da7987332bb95b08554a66",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const RAWG_API_KEY = 'a8d70ee041784cac86f005a63bcdfc0f';
+    const RAWG_BASE_URL = 'https://api.rawg.io/api';
+    let userSettings = { showNsfw: false }; 
+
+    onAuthStateChanged(auth, async (user) => {
+        const loginLink = document.getElementById('loginLink');
+        const logoutLink = document.getElementById('logoutLink');
+        const profileLink = document.getElementById('profileLink');
+        const settingsLink = document.getElementById('settingsLink');
+
+        if (user) {
+            loginLink.style.display = 'none';
+            logoutLink.style.display = 'inline-block';
+            profileLink.style.display = 'inline-block';
+            settingsLink.style.display = 'inline-block';
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
+            userSettings.showNsfw = docSnap.exists() && docSnap.data().showNsfw === true;
+        } else {
+            loginLink.style.display = 'inline-block';
+            logoutLink.style.display = 'none';
+            profileLink.style.display = 'none';
+            settingsLink.style.display = 'none';
+            userSettings = { showNsfw: false };
+        }
+        
+        loadAllGameSections();
+    });
+    
+    function filterUnwantedContent(games) {
+        return games.filter(game => {
+            if (game.ratings_count === 0 && !game.metacritic) {
+                 return false;
+            }
+            if (userSettings.showNsfw) return true;
+            const nsfwTagSlugs = ['nsfw', 'hentai', 'sexual-content', 'gore'];
+            return !game.tags || !game.tags.some(tag => nsfwTagSlugs.includes(tag.slug));
+        });
+    }
+
+    function loadAllGameSections() {
+        const nsfwApiFilter = userSettings.showNsfw ? '' : '&exclude_tags=492,208,216';
+        const year = new Date().getFullYear();
+        
+        fetchAndDisplayGames(`games?ordering=-added&page_size=10${nsfwApiFilter}`, 'carouselInner', true);
+        fetchAndDisplayGames(`games?ordering=-metacritic&page_size=15${nsfwApiFilter}`, 'featuredGames');
+        fetchAndDisplayGames(`games?dates=${year}-01-01,${year}-12-31&ordering=-rating&page_size=15${nsfwApiFilter}`, 'popularGames');
+        fetchAndDisplayGames(`games?dates=${year}-01-01,${new Date().toISOString().split('T')[0]}&ordering=-released&page_size=15${nsfwApiFilter}`, 'newReleases');
+        fetchAndDisplayGames(`games?dates=1995-01-01,2010-12-31&ordering=-metacritic&page_size=15${nsfwApiFilter}`, 'timelessClassics');
+    }
+
+    function createGameItem(game) {
+        const div = document.createElement('div');
+        div.className = 'game-item';
+        div.innerHTML = `<img src="${game.background_image || ''}" alt="${game.name}" loading="lazy" /><div class="game-info"><h3>${game.name}</h3><p>Nota: ${game.rating ? game.rating.toFixed(1) : 'N/A'}/5</p></div>`;
+        div.addEventListener('click', () => window.location.href = `game-details.html?id=${game.id}`);
+        return div;
+    }
+    
+    function createCarouselItem(game) {
+        const div = document.createElement('div');
+        div.className = 'carousel-item';
+        div.style.backgroundImage = `url('${game.background_image}')`;
+        div.dataset.title = game.name;
+        div.dataset.description = `Nota Média: ${game.rating}/5`;
+        div.addEventListener('click', () => window.location.href = `game-details.html?id=${game.id}`);
+        return div;
+    }
+    
+    function createSkeletonCard() {
+        const div = document.createElement('div');
+        div.className = 'skeleton-card';
+        div.innerHTML = `<div class="skeleton-img"></div><div class="skeleton-info"><div class="skeleton-line title"></div><div class="skeleton-line text"></div></div>`;
+        return div;
+    }
+
+    function renderSkeletons(container, count) {
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            container.appendChild(createSkeletonCard());
+        }
+    }
+
+    async function fetchAndDisplayGames(endpoint, containerId, isCarousel = false) {
+        const container = document.getElementById(containerId);
+        const skeletonCount = isCarousel ? 1 : 10;
+        if (!isCarousel) renderSkeletons(container, skeletonCount);
+
+        try {
+            const response = await fetch(`${RAWG_BASE_URL}/${endpoint}&key=${RAWG_API_KEY}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            let data = await response.json();
+
+            let filteredResults = filterUnwantedContent(data.results);
+            container.innerHTML = '';
+            
+            if (filteredResults.length === 0) {
+                 container.innerHTML = '<p>Não foram encontrados jogos com os filtros atuais.</p>';
+                 return;
+            }
+
+            filteredResults.forEach(game => container.appendChild(isCarousel ? createCarouselItem(game) : createGameItem(game)));
+            
+            if (isCarousel) {
+                initHeroCarousel();
+            } else {
+                const section = container.closest('.game-row');
+                if (section) initializeRowCarousel(section);
+            }
+
+        } catch (error) {
+            console.error(`Erro ao buscar jogos para ${containerId}:`, error);
+            container.innerHTML = `<p style="color: #ff5555;">Ocorreu um erro ao carregar os jogos. Tente novamente mais tarde.</p>`;
+        }
+    }
+
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchToggle = document.getElementById('searchToggle');
+    const closeSearchBtn = document.getElementById('closeSearch');
+    const searchInput = document.getElementById('searchInput');
+
+    function openSearch() {
+        searchOverlay.classList.add('active');
+        searchInput.focus();
+    }
+
+    function closeSearch() {
+        searchOverlay.classList.remove('active');
+    }
+
+    searchToggle.addEventListener('click', openSearch);
+    closeSearchBtn.addEventListener('click', closeSearch);
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && searchOverlay.classList.contains('active')) {
+            closeSearch();
+        }
+    });
+    searchOverlay.addEventListener('click', (event) => {
+        if (event.target === searchOverlay) {
+            closeSearch();
+        }
+    });
+
+    document.getElementById('logoutLink').addEventListener('click', () => signOut(auth));
+
+    let searchTimeout;
+    searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            grecaptcha.enterprise.ready(async () => {
+                const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'SEARCH'});
+                const searchQueryText = this.value.trim();
+                const resultsContainer = document.getElementById('searchResults');
+                if (searchQueryText.length < 1) { resultsContainer.innerHTML = ''; return; }
+                
+                if (searchQueryText.startsWith('@')) {
+                    await searchUsers(searchQueryText.substring(1), resultsContainer);
+                } else {
+                    await searchGames(searchQueryText, resultsContainer);
+                }
+            });
+        }, 250);
+    });
+
+    async function searchGames(searchQuery, container) {
+        const apiEndpoint = `${RAWG_BASE_URL}/games?search=${encodeURIComponent(searchQuery)}&page_size=20&ordering=-relevance&key=${RAWG_API_KEY}`;
+        const response = await fetch(apiEndpoint);
+        const data = await response.json();
+        
+        const candidateGames = filterUnwantedContent(data.results);
+
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        candidateGames.sort((a, b) => {
+            const aName = a.name.toLowerCase();
+            const bName = b.name.toLowerCase();
+            if (aName.startsWith(lowerCaseQuery) && !bName.startsWith(lowerCaseQuery)) return -1;
+            if (!aName.startsWith(lowerCaseQuery) && bName.startsWith(lowerCaseQuery)) return 1;
+            return 0;
+        });
+
+        container.innerHTML = candidateGames.length === 0 ? '<p>Nenhum jogo encontrado.</p>' : '';
+        candidateGames.slice(0, 10).forEach(game => container.appendChild(renderGameResult(game)));
+    }
+    
+    async function searchUsers(searchQuery, container) {
+        container.innerHTML = '<p>A pesquisar utilizadores...</p>';
+        if (searchQuery.length < 1) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        try {
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("username", ">=", searchQuery), where("username", "<=", searchQuery + '\uf8ff'), limit(10));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                container.innerHTML = '<p>Nenhum utilizador encontrado.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            querySnapshot.forEach(doc => {
+                const userData = doc.data();
+                if (userData.accountStatus !== 'deactivated' && !userData.isPrivate) {
+                    container.appendChild(renderUserResult(userData));
+                }
+            });
+
+            if (container.innerHTML === '') {
+                container.innerHTML = '<p>Nenhum utilizador público encontrado.</p>';
+            }
+
+        } catch (error) {
+            console.error("Erro ao pesquisar utilizadores:", error);
+            container.innerHTML = `<p style="color: #ff5555;">Ocorreu um erro ao pesquisar. Verifique as permissões da base de dados.</p>`;
+        }
+    }
+
+    function renderGameResult(game) {
+        const a = document.createElement('a');
+        a.className = 'search-result-item';
+        a.href = `game-details.html?id=${game.id}`;
+        a.innerHTML = `<img src="${game.background_image || ''}" alt="${game.name}"><div><h3>${game.name}</h3><p>Nota: ${game.rating ? game.rating.toFixed(1) : 'N/A'}</p></div>`;
+        return a;
+    }
+
+    function renderUserResult(userData) {
+        const a = document.createElement('a');
+        a.className = 'user-search-result-item';
+        a.href = `profile.html?user=${userData.username}`;
+        const emoji = userData.emojiProfile || '👤';
+        const displayName = userData.displayName || userData.username;
+        const username = `@${userData.username}`;
+        a.innerHTML = `<div class="user-avatar-search">${emoji}</div><div class="user-info-search"><h3>${displayName}</h3><p>${username}</p></div>`;
+        return a;
+    }
+
+    let heroSlides, heroTitle, heroDesc, heroCaption;
+    let heroCurrentIndex;
+    let heroSlideInterval;
+    let heroIsTransitioning = false;
+    
+    function initHeroCarousel() {
+        const carouselInner = document.getElementById('carouselInner');
+        if (!carouselInner || carouselInner.children.length < 2) return;
+
+        const firstClone = carouselInner.firstElementChild.cloneNode(true);
+        const lastClone = carouselInner.lastElementChild.cloneNode(true);
+        carouselInner.appendChild(firstClone);
+        carouselInner.insertBefore(lastClone, carouselInner.firstElementChild);
+
+        heroSlides = carouselInner.children;
+        heroTitle = document.getElementById('carouselTitle');
+        heroDesc = document.getElementById('carouselDescription');
+        heroCaption = document.getElementById('carouselCaption');
+        
+        heroCurrentIndex = 1;
+        carouselInner.style.transition = 'none';
+        carouselInner.style.transform = `translateX(-${heroCurrentIndex * 100}%)`;
+
+        setTimeout(() => {
+            carouselInner.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+        }, 50);
+
+        document.getElementById('nextSlide').addEventListener('click', () => handleHeroNav('next'));
+        document.getElementById('prevSlide').addEventListener('click', () => handleHeroNav('prev'));
+        carouselInner.addEventListener('transitionend', handleHeroTransitionEnd);
+
+        startHeroSlideShow();
+        updateHeroContent();
+    }
+    
+    function handleHeroNav(direction) {
+        if (heroIsTransitioning) return;
+        heroIsTransitioning = true;
+        heroCurrentIndex += (direction === 'next' ? 1 : -1);
+        document.getElementById('carouselInner').style.transform = `translateX(-${heroCurrentIndex * 100}%)`;
+        updateHeroContent();
+        resetHeroInterval();
+    }
+    
+    function handleHeroTransitionEnd() {
+        heroIsTransitioning = false;
+        const carouselInner = document.getElementById('carouselInner');
+        if (heroCurrentIndex === 0) {
+            carouselInner.style.transition = 'none';
+            heroCurrentIndex = heroSlides.length - 2;
+            carouselInner.style.transform = `translateX(-${heroCurrentIndex * 100}%)`;
+        } else if (heroCurrentIndex === heroSlides.length - 1) {
+            carouselInner.style.transition = 'none';
+            heroCurrentIndex = 1;
+            carouselInner.style.transform = `translateX(-${heroCurrentIndex * 100}%)`;
+        }
+        carouselInner.offsetHeight; 
+        carouselInner.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+    }
+
+    function updateHeroContent() {
+        if (!heroSlides || heroSlides.length === 0) return;
+        
+        let slideForContent;
+        if (heroCurrentIndex === 0) slideForContent = heroSlides[heroSlides.length - 2]; 
+        else if (heroCurrentIndex === heroSlides.length - 1) slideForContent = heroSlides[1];
+        else slideForContent = heroSlides[heroCurrentIndex];
+
+        heroCaption.style.opacity = 0;
+        setTimeout(() => {
+            heroTitle.textContent = slideForContent.dataset.title;
+            heroDesc.textContent = slideForContent.dataset.description;
+            heroCaption.style.opacity = 1;
+            heroCaption.style.display = 'block';
+        }, 300);
+    }
+    
+    function startHeroSlideShow() {
+        clearInterval(heroSlideInterval);
+        heroSlideInterval = setInterval(() => handleHeroNav('next'), 5000); 
+    }
+
+    function resetHeroInterval() {
+        clearInterval(heroSlideInterval);
+        startHeroSlideShow();
+    }
+    
+    function initializeRowCarousel(sectionElement) {
+        const wrapper = sectionElement.querySelector('.row-carousel-wrapper');
+        const prevBtn = sectionElement.querySelector('.prev');
+        const nextBtn = sectionElement.querySelector('.next');
+
+        if (!wrapper || !prevBtn || !nextBtn) return;
+
+        prevBtn.addEventListener('click', () => {
+            const scrollAmount = wrapper.clientWidth * 0.8;
+            wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            const scrollAmount = wrapper.clientWidth * 0.8;
+            wrapper.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        });
+    }
+
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const banner = document.getElementById('cookie-consent-banner');
+        const acceptBtn = document.getElementById('accept-cookies-btn');
+        const declineBtn = document.getElementById('decline-cookies-btn');
+
+        // Apenas mostrar o banner se o consentimento não tiver sido dado (nem aceite, nem recusado)
+        if (!localStorage.getItem('cookies_consent')) {
+            banner.style.display = 'block';
+        }
+
+        acceptBtn.addEventListener('click', () => {
+            localStorage.setItem('cookies_consent', 'accepted');
+            banner.style.display = 'none';
+        });
+
+        declineBtn.addEventListener('click', () => {
+            // Apenas esconde o banner para a sessão atual, sem guardar dados
+            banner.style.display = 'none';
+        });
+    });
+
+</script>
+</body>
+</html>
