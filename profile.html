@@ -713,7 +713,7 @@
     // Para um ambiente de produção, restrinja a chave na consola do Firebase (e.g., por referenciador HTTP)
     // e considere usar um proxy ou Cloud Functions para chamadas a APIs de terceiros como a RAWG.
     const firebaseConfig = { apiKey: "${{ secrets.Google_API}}", authDomain: "gameboxarmindo.firebaseapp.com", projectId: "gameboxarmindo", storageBucket: "gameboxarmindo.appspot.com", messagingSenderId: "230951536531", appId: "1:230951536531:web:da7987332bb95b08554a66" };
-    const RAWG_API_KEY = 'a8d70ee041784cac86f005a63bcdfc0f';
+    const RAWG_API_KEY = '${{ secrets.rawg_API}}';
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
