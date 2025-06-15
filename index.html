@@ -120,15 +120,6 @@
     </div>
 </div>
 
-<!-- Cookie Consent Banner -->
-<div id="cookie-consent-banner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--medium-bg); color: var(--text-color); padding: 1.5rem; text-align: center; z-index: 5000; border-top: 1px solid var(--border-color);">
-    <p style="margin: 0 0 1rem; font-size: 0.9rem;">Este site utiliza cookies para garantir a melhor experiência. Ao continuar a navegar, concorda com a nossa <a href="/terms.html" style="color: var(--primary-color);">Política de Cookies e Termos de Serviço</a>.</p>
-    <div class="cookie-actions">
-        <button id="decline-cookies-btn" style="background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; margin-right: 1rem;">Recusar</button>
-        <button id="accept-cookies-btn" style="background-color: var(--primary-color); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">Aceitar</button>
-    </div>
-</div>
-
 <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
@@ -243,8 +234,8 @@
             container.innerHTML = '';
             
             if (filteredResults.length === 0) {
-                 container.innerHTML = '<p>Não foram encontrados jogos com os filtros atuais.</p>';
-                 return;
+                container.innerHTML = '<p>Não foram encontrados jogos com os filtros atuais.</p>';
+                return;
             }
 
             filteredResults.forEach(game => container.appendChild(isCarousel ? createCarouselItem(game) : createGameItem(game)));
@@ -490,27 +481,6 @@
     }
 
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const banner = document.getElementById('cookie-consent-banner');
-        const acceptBtn = document.getElementById('accept-cookies-btn');
-        const declineBtn = document.getElementById('decline-cookies-btn');
-
-        // Apenas mostrar o banner se o consentimento não tiver sido dado (nem aceite, nem recusado)
-        if (!localStorage.getItem('cookies_consent')) {
-            banner.style.display = 'block';
-        }
-
-        acceptBtn.addEventListener('click', () => {
-            localStorage.setItem('cookies_consent', 'accepted');
-            banner.style.display = 'none';
-        });
-
-        declineBtn.addEventListener('click', () => {
-            // Apenas esconde o banner para a sessão atual, sem guardar dados
-            banner.style.display = 'none';
-        });
-    });
 
 </script>
 </body>
