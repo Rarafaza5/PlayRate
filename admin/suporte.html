@@ -355,7 +355,7 @@
             const statusClass = `status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
 
             const ticketLink = document.createElement('a');
-            ticketLink.href = `admin-ticket-details.html?id=${ticket.id}`;
+            ticketLink.href = `ticket-details.html?id=${ticket.id}`;
             ticketLink.className = 'ticket-card-link';
 
             const ticketCard = document.createElement('div');
