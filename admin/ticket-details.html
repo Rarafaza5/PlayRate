@@ -499,20 +499,10 @@
     const accessDeniedMessage = document.getElementById('access-denied');
     const notFoundMessage = document.getElementById('not-found');
     const notLoggedInMessage = document.getElementById('not-logged-in');
-
-    const ticketSubjectDisplay = document.getElementById('ticket-subject-display');
-    const ticketStatusDisplay = document.getElementById('ticket-status-display');
-    const ticketIdDisplay = document.getElementById('ticket-id-display'); /* Novo */
-    const ticketUserUsername = document.getElementById('ticket-user-username'); /* Novo */
-    const ticketUserEmail = document.getElementById('ticket-user-email');
-    const ticketUserId = document.getElementById('ticket-user-id');
-    const ticketCreatedAt = document.getElementById('ticket-created-at');
-    const ticketUpdatedAt = document.getElementById('ticket-updated-at');
-    const ticketDescriptionDisplay = document.getElementById('ticket-description-display');
+    
     const statusChangerDetail = document.getElementById('status-changer-detail');
     const adminCommentInput = document.getElementById('admin-comment');
     const btnSubmitUpdate = document.getElementById('btn-submit-update');
-    const activityLogDisplay = document.getElementById('activity-log-display');
 
     const loginLink = document.getElementById('loginLink');
 
@@ -582,6 +572,18 @@
     });
 
     async function fetchTicketDetails(id) {
+        // --- Move Elementos da UI para dentro da função para garantir que o DOM está carregado ---
+        const ticketSubjectDisplay = document.getElementById('ticket-subject-display');
+        const ticketStatusDisplay = document.getElementById('ticket-status-display');
+        const ticketIdDisplay = document.querySelector('.ticket-id strong'); /* Select the strong tag inside ticket-id */
+        const ticketUserUsername = document.getElementById('ticket-user-username');
+        const ticketUserEmail = document.getElementById('ticket-user-email');
+        const ticketUserId = document.getElementById('ticket-user-id');
+        const ticketCreatedAt = document.getElementById('ticket-created-at');
+        const ticketUpdatedAt = document.getElementById('ticket-updated-at');
+        const ticketDescriptionDisplay = document.getElementById('ticket-description-display');
+        const activityLogDisplay = document.getElementById('activity-log-display');
+
         try {
             const ticketRef = doc(db, "tickets", id);
             const ticketSnap = await getDoc(ticketRef);
@@ -590,13 +592,15 @@
                 const ticket = ticketSnap.data();
                 ticketDetailsContent.style.display = 'block';
 
-                ticketSubjectDisplay.textContent = ticket.subject;
-                ticketStatusDisplay.textContent = ticket.status;
-                ticketStatusDisplay.className = `ticket-status-admin status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
-                ticketIdDisplay.textContent = id; /* Exibe o ID do ticket */
+                if (ticketSubjectDisplay) ticketSubjectDisplay.textContent = ticket.subject;
+                if (ticketStatusDisplay) {
+                    ticketStatusDisplay.textContent = ticket.status;
+                    ticketStatusDisplay.className = `ticket-status-admin status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
+                }
+                if (ticketIdDisplay) ticketIdDisplay.textContent = id; /* Exibe o ID do ticket */
 
-                ticketUserEmail.textContent = ticket.userEmail;
-                ticketUserId.textContent = ticket.userId;
+                if (ticketUserEmail) ticketUserEmail.textContent = ticket.userEmail;
+                if (ticketUserId) ticketUserId.textContent = ticket.userId;
 
                 // Armazenar o UID do criador do ticket para o log de atividades
                 ticketCreatorUid = ticket.userId;
@@ -612,15 +616,15 @@
                         username = 'Usuário (não encontrado)';
                     }
                 }
-                ticketUserUsername.textContent = username;
+                if (ticketUserUsername) ticketUserUsername.textContent = username;
 
-                ticketCreatedAt.textContent = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString('pt-BR') : 'N/A';
-                ticketUpdatedAt.textContent = ticket.updatedAt ? ticket.updatedAt.toDate().toLocaleString('pt-BR') : 'N/A';
-                ticketDescriptionDisplay.textContent = ticket.description;
+                if (ticketCreatedAt) ticketCreatedAt.textContent = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString('pt-BR') : 'N/A';
+                if (ticketUpdatedAt) ticketUpdatedAt.textContent = ticket.updatedAt ? ticket.updatedAt.toDate().toLocaleString('pt-BR') : 'N/A';
+                if (ticketDescriptionDisplay) ticketDescriptionDisplay.textContent = ticket.description;
 
-                statusChangerDetail.value = ticket.status;
+                if (statusChangerDetail) statusChangerDetail.value = ticket.status;
 
-                renderActivityLog(ticket.statusLog || []);
+                if (activityLogDisplay) renderActivityLog(ticket.statusLog || []);
 
                 // Remove previous event listener to prevent duplicates
                 btnSubmitUpdate.removeEventListener('click', handleSubmitUpdate);
@@ -683,6 +687,9 @@
     }
 
     function renderActivityLog(logEntries) {
+        const activityLogDisplay = document.getElementById('activity-log-display'); // Get it here too
+        if (!activityLogDisplay) return; // Defensive check
+
         activityLogDisplay.innerHTML = '';
 
         if (logEntries.length === 0) {
@@ -699,10 +706,10 @@
             // Verifica se é a criação inicial do ticket pelo usuário
             if (entry.changedBy === ticketCreatorUid && entry.comment && entry.comment.includes('Ticket criado pelo usuário.')) {
                 borderColorClass = 'log-initial-creation';
-            } else if (entry.changedBy === currentAdminUser.uid && entry.comment && entry.status === statusChangerDetail.value) {
-                // Se o status no log é o mesmo do dropdown atual, e o admin fez a mudança, pode ser apenas um comentário
-                // Poderíamos ter uma classe 'log-comment-only' se quisermos diferenciá-los.
-                // Mas para manter a simplicidade e focar no admin, 'log-status-update' está bom.
+            } else if (entry.changedBy === currentAdminUser.uid && entry.comment && statusChangerDetail && entry.status === statusChangerDetail.value) {
+                // If the status in the log is the same as the current dropdown, and the admin made the change,
+                // it might just be a comment. We can keep it as 'log-status-update' or define a 'log-comment-only' class.
+                // For now, keeping it as 'log-status-update' for admin actions.
             }
 
             activityItem.className = `activity-item ${borderColorClass}`;
