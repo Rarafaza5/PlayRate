@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detalhes do Ticket - PlayRate Admin</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg"></script>
+    <style>
+        /* Variáveis de cor já definidas em styles.css, mas mantidas para clareza local */
+        :root {
+            --primary-color: #9f5dff;
+            --primary-hover: #8e4ce6;
+            --dark-bg: #101016;
+            --medium-bg: #1c1c24;
+            --light-bg: #2a2a36;
+            --text-color: #f0f0f5;
+            --text-muted: #a0a0b0;
+            --border-color: #383844;
+            --success-color: #28a745;
+            --danger-color: #ff5566;
+            --info-color: #00adee;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 2rem auto 4rem;
+            padding: 0 1rem;
+        }
+
+        .ticket-details-card {
+            background-color: var(--medium-bg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* Nova área para o cabeçalho do ticket */
+        .ticket-header-area {
+            display: flex;
+            flex-direction: column; /* Começa como coluna para melhor empilhamento */
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            align-items: flex-start; /* Alinha itens à esquerda */
+        }
+
+        .ticket-header-area h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.2rem; /* Título maior */
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .ticket-header-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .ticket-header-meta .ticket-id {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .ticket-status-admin {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            z-index: 10;
+            text-transform: capitalize;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Sombra para o badge */
+        }
+        /* Cores dos status (padronizadas para PT - replicando as cores do admin-support.html original) */
+        .status-aberto { background-color: #416422; }
+        .status-em-progresso { background-color: #ff9d00; }
+        .status-fechado { background-color: #58b434; }
+        .status-rejeitado { background-color: var(--danger-color); }
+
+
+        /* Layout em grid para as informações do ticket */
+        .ticket-info-section {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        .ticket-info-section h2 {
+            color: var(--text-color);
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .ticket-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-item strong {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+
+        .info-item span {
+            color: var(--text-color);
+            font-size: 0.95rem;
+            word-break: break-all; /* Para emails e IDs longos */
+        }
+
+
+        .ticket-description-full {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            white-space: pre-wrap;
+            color: #ccc;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .status-update-section {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .status-update-section h2, .activity-history h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(159, 93, 255, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--medium-bg); /* Fundo mais escuro para inputs */
+            color: var(--text-color);
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-group textarea {
+            min-height: 80px;
+        }
+
+        .form-group select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23a0a0b0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1.2em;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(159, 93, 255, 0.2);
+        }
+
+        .btn-update-ticket {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+        }
+        .btn-update-ticket:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        .btn-update-ticket:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .activity-history {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .activity-item {
+            background-color: var(--medium-bg); /* Fundo mais escuro para itens de log */
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .activity-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .activity-item strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 0.3rem;
+        }
+        .activity-item p {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin: 0.5rem 0;
+            white-space: pre-wrap;
+        }
+        .activity-item .timestamp {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        /* Cores da borda do log de atividade baseadas no tipo de evento */
+        .activity-item.log-status-update { border-left-color: var(--primary-color); }
+        .activity-item.log-initial-creation { border-left-color: var(--success-color); }
+        .activity-item.log-comment-only { border-left-color: var(--info-color); }
+
+
+        /* Notificação (para feedback de sucesso/erro) */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            z-index: 3000;
+            opacity: 0;
+            transform: translate(-50%, 20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            min-width: 250px;
+            text-align: center;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .back-button-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .btn-back {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            background-color: #3a3a4a;
+            border-color: var(--primary-color);
+        }
+
+        .loading-message, .error-message {
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        .error-message { color: var(--danger-color); }
+        .grecaptcha-badge {
+            visibility: hidden;
+        }
+        /* Responsividade para telas menores */
+        @media (max-width: 768px) {
+            .ticket-details-card {
+                padding: 1.5rem;
+            }
+            .ticket-header-area {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .ticket-header-area h1 {
+                margin-bottom: 0.5rem;
+            }
+            .ticket-info-grid {
+                grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+                gap: 1rem;
+            }
+            .status-update-section h2, .activity-history h2 {
+                font-size: 1.2rem;
+            }
+            .btn-update-ticket {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+         <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <img src="favicon.png" alt="PlayRate Favicon" style="height: 35px; vertical-align: middle; margin-right: 8px; position: relative; top: 2px;">
+            PlayRate <span style="font-size: 0.8em; vertical-align: super; color: #868686; margin-left: 5px;">BETA</span>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="profile.html" id="profileLink" style="display: none;">Perfil</a>
+            <a href="settings.html" id="settingsLink" style="display: none;">Definições</a>
+            <a href="#" id="logoutLink" style="display: none;">Sair</a>
+            <a href="login.html" id="loginLink" style="display: none;">Login</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div id="loading-details" class="loading-message">A carregar detalhes do ticket...</div>
+    <div id="ticket-details-content" style="display: none;">
+        <div class="ticket-details-card">
+            <div class="ticket-header-area">
+                <h1 id="ticket-subject-display"></h1>
+                <div class="ticket-header-meta">
+                    <span id="ticket-status-display" class="ticket-status-admin"></span>
+                    <span class="ticket-id">ID: <strong></strong></span>
+                </div>
+            </div>
+
+            <div class="ticket-info-section">
+                <h2>Informações do Cliente</h2>
+                <div class="ticket-info-grid">
+                    <div class="info-item">
+                        <strong>Usuário:</strong>
+                        <span id="ticket-user-username"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Email:</strong>
+                        <span id="ticket-user-email"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>ID do Usuário:</strong>
+                        <span id="ticket-user-id"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Criado em:</strong>
+                        <span id="ticket-created-at"></span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Última Atualização:</strong>
+                        <span id="ticket-updated-at"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-description-section">
+                <h2>Descrição do Ticket</h2>
+                <div id="ticket-description-display" class="ticket-description-full"></div>
+            </div>
+
+
+            <div class="status-update-section">
+                <h2>Atualizar Estado e Adicionar Comentário</h2>
+                <div class="form-group">
+                    <label for="status-changer-detail">Novo Estado:</label>
+                    <select id="status-changer-detail">
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em Progresso">Em Progresso</option>
+                        <option value="Fechado">Fechado</option>
+                        <option value="Rejeitado">Rejeitado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="admin-comment">Comentário (opcional):</label>
+                    <textarea id="admin-comment" placeholder="Adicione um comentário sobre a atualização..."></textarea>
+                </div>
+                <button id="btn-submit-update" class="btn-update-ticket">Atualizar Ticket</button>
+            </div>
+
+            <div class="activity-history">
+                <h2>Histórico de Atividade</h2>
+                <div id="activity-log-display">
+                    <p class="loading-message">A carregar histórico...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-button-container">
+            <a href="admin-support.html" class="btn-back">← Voltar para o Painel</a>
+        </div>
+    </div>
+    <div id="access-denied" class="error-message" style="display: none;">
+        Acesso negado. Você não tem permissões de administrador para ver os detalhes do ticket.
+    </div>
+    <div id="not-found" class="error-message" style="display: none;">
+        Ticket não encontrado ou ID inválido.
+    </div>
+    <div id="not-logged-in" class="error-message" style="display: none;">
+        Por favor, faça login para aceder a esta página. Redirecionando para a página de login...
+    </div>
+</main>
+
+<footer>
+    <p>&copy; <span id="copyright-year"></span> PlayRate. Todos os direitos reservados. | <a href="terms.html" style="color: var(--text-muted);">Termos e Condições</a> e <a href="pdp.html" style="color: var(--text-muted);">Políticas de Privacidade</a></p><br>
+    <p>Suporte: <a href="mailto:suporte@playrate.fun" style="color: var(--text-muted);">suporte@playrate.fun</a></p>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+        Este site é protegido por reCAPTCHA e aplicam-se a
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a> e os
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos de Serviço</a> da Google.
+    </p>
+</footer>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc, updateDoc, Timestamp, arrayUnion } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "%%GOOGLE_API%%",
+        authDomain: "gameboxarmindo.firebaseapp.com",
+        projectId: "gameboxarmindo",
+        storageBucket: "gameboxarmindo.appspot.com",
+        messagingSenderId: "230951536531",
+        appId: "1:230951536531:web:da7987332bb95b08554a66",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- Elementos da UI ---
+    const loadingDetailsMessage = document.getElementById('loading-details');
+    const ticketDetailsContent = document.getElementById('ticket-details-content');
+    const accessDeniedMessage = document.getElementById('access-denied');
+    const notFoundMessage = document.getElementById('not-found');
+    const notLoggedInMessage = document.getElementById('not-logged-in');
+
+    const ticketSubjectDisplay = document.getElementById('ticket-subject-display');
+    const ticketStatusDisplay = document.getElementById('ticket-status-display');
+    const ticketIdDisplay = document.getElementById('ticket-id-display'); /* Novo */
+    const ticketUserUsername = document.getElementById('ticket-user-username'); /* Novo */
+    const ticketUserEmail = document.getElementById('ticket-user-email');
+    const ticketUserId = document.getElementById('ticket-user-id');
+    const ticketCreatedAt = document.getElementById('ticket-created-at');
+    const ticketUpdatedAt = document.getElementById('ticket-updated-at');
+    const ticketDescriptionDisplay = document.getElementById('ticket-description-display');
+    const statusChangerDetail = document.getElementById('status-changer-detail');
+    const adminCommentInput = document.getElementById('admin-comment');
+    const btnSubmitUpdate = document.getElementById('btn-submit-update');
+    const activityLogDisplay = document.getElementById('activity-log-display');
+
+    const loginLink = document.getElementById('loginLink');
+
+    let ticketId = new URLSearchParams(window.location.search).get('id');
+    let authCheckCompleted = false;
+    let currentAdminUser = null;
+    let ticketCreatorUid = null; // Para verificar no log de atividades
+
+    // --- Função de Notificação Reutilizável ---
+    function showNotification(message, type = 'success', duration = 4000) {
+        let notification = document.getElementById('app-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'app-notification';
+            notification.className = 'notification';
+            document.body.appendChild(notification);
+        }
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, duration);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (authCheckCompleted) return;
+
+        loadingDetailsMessage.style.display = 'none';
+
+        const profileLink = document.getElementById('profileLink');
+        const settingsLink = document.getElementById('settingsLink');
+        const logoutLink = document.getElementById('logoutLink');
+
+        if (user) {
+            currentAdminUser = user;
+            loginLink.style.display = 'none';
+            profileLink.style.display = 'inline-block';
+            settingsLink.style.display = 'inline-block';
+            logoutLink.style.display = 'inline-block';
+
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists() && userDocSnap.data().admin === true) {
+                if (ticketId) {
+                    fetchTicketDetails(ticketId);
+                } else {
+                    notFoundMessage.style.display = 'block';
+                }
+            } else {
+                accessDeniedMessage.style.display = 'block';
+            }
+        } else {
+            loginLink.style.display = 'inline-block';
+            profileLink.style.display = 'none';
+            settingsLink.style.display = 'none';
+            logoutLink.style.display = 'none';
+
+            notLoggedInMessage.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 3000);
+        }
+        authCheckCompleted = true;
+    });
+
+    async function fetchTicketDetails(id) {
+        try {
+            const ticketRef = doc(db, "tickets", id);
+            const ticketSnap = await getDoc(ticketRef);
+
+            if (ticketSnap.exists()) {
+                const ticket = ticketSnap.data();
+                ticketDetailsContent.style.display = 'block';
+
+                ticketSubjectDisplay.textContent = ticket.subject;
+                ticketStatusDisplay.textContent = ticket.status;
+                ticketStatusDisplay.className = `ticket-status-admin status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
+                ticketIdDisplay.textContent = id; /* Exibe o ID do ticket */
+
+                ticketUserEmail.textContent = ticket.userEmail;
+                ticketUserId.textContent = ticket.userId;
+
+                // Armazenar o UID do criador do ticket para o log de atividades
+                ticketCreatorUid = ticket.userId;
+
+                // Buscar o username do usuário que criou o ticket (se não estiver no próprio ticket)
+                let username = ticket.username || 'Carregando...'; // Assume que pode vir no ticket ou busca
+                if (!ticket.username && ticket.userId) {
+                    const creatorUserDocRef = doc(db, "users", ticket.userId);
+                    const creatorUserSnap = await getDoc(creatorUserDocRef);
+                    if (creatorUserSnap.exists()) {
+                        username = creatorUserSnap.data().username || creatorUserSnap.data().displayName || 'Usuário Desconhecido';
+                    } else {
+                        username = 'Usuário (não encontrado)';
+                    }
+                }
+                ticketUserUsername.textContent = username;
+
+                ticketCreatedAt.textContent = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString('pt-BR') : 'N/A';
+                ticketUpdatedAt.textContent = ticket.updatedAt ? ticket.updatedAt.toDate().toLocaleString('pt-BR') : 'N/A';
+                ticketDescriptionDisplay.textContent = ticket.description;
+
+                statusChangerDetail.value = ticket.status;
+
+                renderActivityLog(ticket.statusLog || []);
+
+                // Remove previous event listener to prevent duplicates
+                btnSubmitUpdate.removeEventListener('click', handleSubmitUpdate);
+                btnSubmitUpdate.addEventListener('click', handleSubmitUpdate);
+
+            } else {
+                notFoundMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Erro ao carregar detalhes do ticket:", error);
+            showNotification("Erro ao carregar detalhes do ticket.", "error");
+            notFoundMessage.textContent = "Ocorreu um erro ao carregar os detalhes do ticket.";
+            notFoundMessage.style.display = 'block';
+        }
+    }
+
+    async function handleSubmitUpdate() {
+        const newStatus = statusChangerDetail.value;
+        const adminComment = adminCommentInput.value.trim();
+        updateTicketStatus(ticketId, newStatus, adminComment);
+    }
+
+    async function updateTicketStatus(id, newStatus, adminComment) {
+        grecaptcha.enterprise.ready(async () => {
+            const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'update_ticket_status'});
+            console.log("Token reCAPTCHA para atualização:", token);
+
+            btnSubmitUpdate.disabled = true;
+            btnSubmitUpdate.textContent = 'Atualizando...';
+
+            try {
+                const ticketRef = doc(db, "tickets", id);
+
+                const activityEntry = {
+                    status: newStatus,
+                    comment: adminComment || null,
+                    changedBy: currentAdminUser.uid,
+                    changedByEmail: currentAdminUser.email,
+                    timestamp: Timestamp.now()
+                };
+
+                await updateDoc(ticketRef, {
+                    status: newStatus,
+                    updatedAt: Timestamp.now(),
+                    statusLog: arrayUnion(activityEntry)
+                });
+
+                showNotification(`Ticket atualizado para "${newStatus}"!`, "success");
+                adminCommentInput.value = '';
+                fetchTicketDetails(id); // Recarrega os detalhes para atualizar a UI e o histórico
+
+            } catch (error) {
+                console.error("Erro ao atualizar status do ticket:", error);
+                showNotification("Erro ao atualizar ticket. Tente novamente.", "error");
+            } finally {
+                btnSubmitUpdate.disabled = false;
+                btnSubmitUpdate.textContent = 'Atualizar Ticket';
+            }
+        });
+    }
+
+    function renderActivityLog(logEntries) {
+        activityLogDisplay.innerHTML = '';
+
+        if (logEntries.length === 0) {
+            activityLogDisplay.innerHTML = '<p class="text-muted">Nenhuma atividade registada para este ticket.</p>';
+            return;
+        }
+
+        const sortedLog = [...logEntries].sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+
+        sortedLog.forEach(entry => {
+            const activityItem = document.createElement('div');
+            let borderColorClass = 'log-status-update'; // Padrão para atualização de admin
+            
+            // Verifica se é a criação inicial do ticket pelo usuário
+            if (entry.changedBy === ticketCreatorUid && entry.comment && entry.comment.includes('Ticket criado pelo usuário.')) {
+                borderColorClass = 'log-initial-creation';
+            } else if (entry.changedBy === currentAdminUser.uid && entry.comment && entry.status === statusChangerDetail.value) {
+                // Se o status no log é o mesmo do dropdown atual, e o admin fez a mudança, pode ser apenas um comentário
+                // Poderíamos ter uma classe 'log-comment-only' se quisermos diferenciá-los.
+                // Mas para manter a simplicidade e focar no admin, 'log-status-update' está bom.
+            }
+
+            activityItem.className = `activity-item ${borderColorClass}`;
+
+            const timestamp = entry.timestamp ? entry.timestamp.toDate().toLocaleString('pt-BR') : 'N/A';
+            const changedByText = entry.changedByEmail || 'Sistema';
+
+            let commentContent = '';
+            if (entry.comment) {
+                commentContent = `<p>Comentário: ${entry.comment}</p>`;
+            }
+
+            activityItem.innerHTML = `
+                <strong>Estado: ${entry.status}</strong>
+                ${commentContent}
+                <div class="timestamp">Por: ${changedByText} em ${timestamp}</div>
+            `;
+            activityLogDisplay.appendChild(activityItem);
+        });
+    }
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error("Erro ao fazer logout:", error);
+            alert("Erro ao fazer logout. Tente novamente.");
+        });
+    });
+
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

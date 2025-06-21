@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Suporte - PlayRate</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg"></script>
+    <style>
+        /* Variáveis de cor já definidas em styles.css, mas mantidas para clareza local */
+        :root {
+            --primary-color: #9f5dff;
+            --primary-hover: #8e4ce6;
+            --dark-bg: #101016;
+            --medium-bg: #1c1c24;
+            --light-bg: #2a2a36;
+            --text-color: #f0f0f5;
+            --text-muted: #a0a0b0;
+            --border-color: #383844;
+            --success-color: #28a745;
+            --danger-color: #ff5566;
+            --info-color: #00adee;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 2rem auto 4rem;
+            padding: 0 1rem;
+        }
+
+        .support-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .support-card {
+            background-color: var(--medium-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .support-card h1, .support-card h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .message.success { color: var(--success-color); }
+        .message.error { color: var(--danger-color); }
+        .message.info { color: var(--info-color); }
+
+        .ticket-list {
+            margin-top: 2rem;
+        }
+
+        /* Estilos para o item do ticket clicável */
+        .ticket-item-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-grow: 1;
+            padding-right: 1rem;
+            align-items: center;
+        }
+
+        .ticket-item {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+        }
+        .ticket-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-color: var(--primary-color);
+        }
+
+
+        .ticket-item-content {
+            flex-grow: 1;
+        }
+
+        .ticket-item h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            word-break: break-word;
+        }
+
+        .ticket-item p {
+            margin: 0.5rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .ticket-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Cores dos status (padronizadas para PT - replicando as cores do admin-support.html original) */
+        .status-aberto { background-color: #9f5dff; }
+        .status-em-progresso { background-color: #ff9d00; }
+        .status-completo { background-color: #58b434; }
+        .status-rejeitado { background-color: var(--danger-color); }
+
+        .btn-delete-ticket {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn-delete-ticket:hover {
+            background-color: #cc4455;
+        }
+        .btn-delete-ticket:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .grecaptcha-badge {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+         <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <img src="favicon.png" alt="PlayRate Favicon" style="height: 35px; vertical-align: middle; margin-right: 8px; position: relative; top: 2px;">
+            PlayRate <span style="font-size: 0.8em; vertical-align: super; color: #868686; margin-left: 5px;">BETA</span>
+        </div>
+        <nav>
+         
+            <a href="profile.html" id="profileLink">Perfil</a>
+            <a href="settings.html" id="settingsLink" style="display: none;">Definições</a>
+            <a href="#" id="logoutLink" style="display: none;">Sair</a>
+            <a href="login.html" id="loginLink">Login</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="support-container">
+        <div class="support-card">
+            <h1>Enviar um Novo Ticket de Suporte</h1>
+            <form id="ticket-form">
+                <div class="form-group">
+                    <label for="ticket-subject">Assunto</label>
+                    <input type="text" id="ticket-subject" required maxlength="100" placeholder="Ex: Problema de login, erro no jogo X, sugestão">
+                </div>
+                <div class="form-group">
+                    <label for="ticket-description">Descrição</label>
+                    <textarea id="ticket-description" required maxlength="1000" placeholder="Descreva o seu problema ou sugestão em detalhe."></textarea>
+                </div>
+                <button type="submit" id="submit-ticket-btn" class="btn-submit">Enviar Ticket</button>
+                <p id="ticket-message" class="message"></p>
+            </form>
+        </div>
+
+        <div class="support-card">
+            <h2>Os Meus Tickets Anteriores</h2>
+            <div id="user-tickets-list" class="ticket-list">
+                <p class="message info">A carregar os seus tickets...</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; <span id="copyright-year"></span> PlayRate. Todos os direitos reservados. | <a href="terms.html" style="color: var(--text-muted);">Termos e Condições</a> e <a href="pdp.html" style="color: var(--text-muted);">Políticas de Privacidade</a></p><br>
+    <p>Suporte: <a href="mailto:suporte@playrate.fun" style="color: var(--text-muted);">suporte@playrate.fun</a></p>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+        Este site é protegido por reCAPTCHA e aplicam-se a
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a> e os
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos de Serviço</a> da Google.
+    </p>
+</footer>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, limit, Timestamp, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "%%GOOGLE_API%%",
+        authDomain: "gameboxarmindo.firebaseapp.com",
+        projectId: "gameboxarmindo",
+        storageBucket: "gameboxarmindo.appspot.com",
+        messagingSenderId: "230951536531",
+        appId: "1:230951536531:web:da7987332bb95b08554a66",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    // --- Elementos da UI ---
+    const ticketForm = document.getElementById('ticket-form');
+    const ticketSubjectInput = document.getElementById('ticket-subject');
+    const ticketDescriptionInput = document.getElementById('ticket-description');
+    const submitTicketBtn = document.getElementById('submit-ticket-btn');
+    const ticketMessage = document.getElementById('ticket-message');
+    const userTicketsList = document.getElementById('user-tickets-list');
+
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        const loginLink = document.getElementById('loginLink');
+        const logoutLink = document.getElementById('logoutLink');
+        const profileLink = document.getElementById('profileLink');
+        const settingsLink = document.getElementById('settingsLink');
+
+        if (currentUser) {
+            loginLink.style.display = 'none';
+            logoutLink.style.display = 'inline-block';
+            profileLink.style.display = 'inline-block';
+            settingsLink.style.display = 'inline-block';
+            loadUserTickets();
+        } else {
+            loginLink.style.display = 'inline-block';
+            logoutLink.style.display = 'none';
+            profileLink.style.display = 'none';
+            settingsLink.style.display = 'none';
+            ticketForm.style.display = 'none';
+            ticketMessage.textContent = 'Por favor, faça login para enviar tickets de suporte.';
+            ticketMessage.className = 'message info';
+            userTicketsList.innerHTML = '<p class="message info">Faça login para ver os seus tickets.</p>';
+        }
+    });
+
+    // Submissão de Ticket
+    ticketForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentUser) {
+            ticketMessage.textContent = 'Você precisa estar logado para enviar um ticket.';
+            ticketMessage.className = 'message error';
+            return;
+        }
+
+        grecaptcha.enterprise.ready(async () => {
+            const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'submit_ticket'});
+
+            submitTicketBtn.disabled = true;
+            submitTicketBtn.textContent = 'A enviar...';
+            ticketMessage.textContent = '';
+
+            try {
+                const newTicketData = {
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    subject: ticketSubjectInput.value,
+                    description: ticketDescriptionInput.value,
+                    status: 'Aberto',
+                    createdAt: Timestamp.now(),
+                    updatedAt: Timestamp.now(),
+                    statusLog: [{
+                        status: 'Aberto',
+                        comment: 'Ticket criado pelo usuário.',
+                        changedBy: currentUser.uid,
+                        changedByEmail: currentUser.email,
+                        timestamp: Timestamp.now()
+                    }]
+                };
+
+                await addDoc(collection(db, "tickets"), newTicketData);
+
+                ticketMessage.textContent = 'Ticket enviado com sucesso! Entraremos em contacto brevemente.';
+                ticketMessage.className = 'message success';
+                ticketForm.reset();
+                loadUserTickets();
+            } catch (error) {
+                console.error("Erro ao enviar ticket:", error);
+                ticketMessage.textContent = 'Ocorreu um erro ao enviar o seu ticket. Tente novamente.';
+                ticketMessage.className = 'message error';
+            } finally {
+                submitTicketBtn.disabled = false;
+                submitTicketBtn.textContent = 'Enviar Ticket';
+            }
+        });
+    });
+
+    // Carregar Tickets do Usuário - MODIFICADO para linkar para página de detalhes e melhor UI
+    async function loadUserTickets() {
+        if (!currentUser) return;
+
+        userTicketsList.innerHTML = '<p class="message info">A carregar os seus tickets...</p>';
+
+        try {
+            const q = query(
+                collection(db, "tickets"),
+                where("userId", "==", currentUser.uid),
+                orderBy("createdAt", "desc"),
+                limit(10)
+            );
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                userTicketsList.innerHTML = '<p class="message info">Você não tem tickets de suporte abertos ou anteriores.</p>';
+                return;
+            }
+
+            userTicketsList.innerHTML = '';
+            querySnapshot.forEach((docSnap) => {
+                const ticket = docSnap.data();
+                const ticketId = docSnap.id;
+                const createdAt = ticket.createdAt.toDate().toLocaleString('pt-BR');
+
+                const statusClass = `status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
+
+                const ticketItem = document.createElement('div');
+                ticketItem.className = 'ticket-item';
+
+                const ticketLink = document.createElement('a');
+                ticketLink.href = `user-ticket-details.html?id=${ticketId}`;
+                ticketLink.className = 'ticket-item-link';
+                ticketLink.style.flexGrow = '1';
+                ticketLink.style.paddingRight = '1rem';
+
+                ticketLink.innerHTML = `
+                    <div class="ticket-item-content">
+                        <h3>${ticket.subject}</h3>
+                        <p>Criado em: ${createdAt}</p>
+                    </div>
+                `;
+                ticketItem.appendChild(ticketLink);
+
+                const ticketActions = document.createElement('div');
+                ticketActions.className = 'ticket-actions';
+                ticketActions.innerHTML = `<span class="ticket-status ${statusClass}">${ticket.status}</span>`;
+
+                if (ticket.status === 'Aberto') {
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'btn-delete-ticket';
+                    deleteButton.textContent = 'Apagar';
+                    deleteButton.dataset.ticketId = ticketId;
+                    ticketActions.appendChild(deleteButton);
+                }
+                ticketItem.appendChild(ticketActions);
+                userTicketsList.appendChild(ticketItem);
+            });
+
+            document.querySelectorAll('.btn-delete-ticket').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const idToDelete = e.target.dataset.ticketId;
+                    if (confirm('Tem certeza que deseja apagar este ticket? Esta ação não pode ser desfeita.')) {
+                        deleteTicket(idToDelete);
+                    }
+                });
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar tickets:", error);
+            userTicketsList.innerHTML = '<p class="message error">Ocorreu um erro ao carregar os seus tickets.</p>';
+        }
+    }
+
+    async function deleteTicket(ticketId) {
+        grecaptcha.enterprise.ready(async () => {
+            const token = await grecaptcha.enterprise.execute('6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg', {action: 'delete_ticket'});
+            console.log("Token reCAPTCHA para apagar ticket:", token);
+
+            try {
+                await deleteDoc(doc(db, "tickets", ticketId));
+                alert("Ticket apagado com sucesso!");
+                loadUserTickets();
+            } catch (error) {
+                console.error("Erro ao apagar ticket:", error);
+                alert("Ocorreu um erro ao apagar o ticket. Tente novamente.");
+            }
+        });
+    }
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error("Erro ao fazer logout:", error);
+            alert("Erro ao fazer logout. Tente novamente.");
+        });
+    });
+
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

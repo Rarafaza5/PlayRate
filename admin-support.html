@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painel de Suporte Admin - PlayRate</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lclz2ArAAAAABsOzCXMLRNNysfM4qpaCenAC5Gg"></script>
+    <style>
+        /* Variáveis de cor já definidas em styles.css, mas mantidas para clareza local */
+        :root {
+            --primary-color: #9f5dff;
+            --primary-hover: #8e4ce6;
+            --dark-bg: #101016;
+            --medium-bg: #1c1c24;
+            --light-bg: #2a2a36;
+            --text-color: #f0f0f5;
+            --text-muted: #a0a0b0;
+            --border-color: #383844;
+            --success-color: #28a745;
+            --danger-color: #ff5566;
+            --info-color: #00adee;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto 4rem;
+            padding: 0 1rem;
+        }
+
+        .admin-dashboard {
+            background-color: var(--medium-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .admin-dashboard h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--primary-color);
+        }
+
+        .ticket-filters {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .ticket-filters label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .ticket-filters select {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .ticket-filters select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Estilos para o item do ticket clicável */
+        .ticket-card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .ticket-card {
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border-color: var(--primary-color);
+        }
+
+        .ticket-card h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        .ticket-card p {
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .ticket-card .description {
+            max-height: 100px;
+            overflow-y: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border: 1px solid var(--border-color);
+            padding: 0.8rem;
+            border-radius: 6px;
+            background-color: var(--medium-bg);
+            margin-bottom: 1rem;
+            color: #ccc;
+            flex-grow: 1;
+        }
+        .ticket-card .description:after {
+            content: '';
+            position: absolute;
+            bottom: 50px;
+            left: 1.5rem;
+            right: 1.5rem;
+            height: 30px;
+            background: linear-gradient(to top, var(--light-bg) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+
+        .ticket-status-admin {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 10;
+        }
+        /* Cores dos status (padronizadas para PT - replicando as cores do admin-support.html original) */
+        .status-aberto { background-color: #9f5dff; }
+        .status-em-progresso { background-color: #ff9d00; }
+        .status-completo { background-color: #58b434; }
+        .status-rejeitado { background-color: var(--danger-color); }
+
+
+        .status-changer {
+            display: none; /* Escondido nesta visualização, aparece na página de detalhes */
+        }
+
+
+        .loading-message, .error-message, .no-tickets-message {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+        .error-message { color: var(--danger-color); }
+        .no-tickets-message { color: var(--info-color); }
+
+        .grecaptcha-badge {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+         <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <img src="favicon.png" alt="PlayRate Favicon" style="height: 35px; vertical-align: middle; margin-right: 8px; position: relative; top: 2px;">
+            PlayRate <span style="font-size: 0.8em; vertical-align: super; color: #868686; margin-left: 5px;">BETA</span>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="profile.html" id="profileLink" style="display: none;">Perfil</a>
+            <a href="settings.html" id="settingsLink" style="display: none;">Definições</a>
+            <a href="#" id="logoutLink" style="display: none;">Sair</a>
+            <a href="login.html" id="loginLink" style="display: none;">Login</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="admin-dashboard">
+        <h1>Painel de Suporte</h1>
+        <div id="loading-initial" class="loading-message">A verificar o seu estado de login e permissões...</div>
+        <div id="admin-content" style="display: none;">
+            <div class="ticket-filters">
+                <label for="filter-status">Filtrar por Estado:</label>
+                <select id="filter-status">
+                    <option value="all">Todos</option>
+                    <option value="Aberto">Aberto</option>
+                    <option value="Em Progresso">Em Progresso</option>
+                    <option value="Completo">Completo</option>
+                    <option value="Rejeitado">Rejeitado</option>
+                </select>
+            </div>
+            <div id="tickets-grid" class="tickets-grid">
+                <p class="loading-message">A carregar tickets...</p>
+            </div>
+        </div>
+        <div id="access-denied" class="error-message" style="display: none;">
+            Acesso negado. Você não tem permissões de administrador.
+        </div>
+        <div id="not-logged-in" class="error-message" style="display: none;">
+            Por favor, faça login para aceder a esta página. Redirecionando para a página de login...
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; <span id="copyright-year"></span> PlayRate. Todos os direitos reservados. | <a href="terms.html" style="color: var(--text-muted);">Termos e Condições</a> e <a href="pdp.html" style="color: var(--text-muted);">Políticas de Privacidade</a></p><br>
+    <p>Suporte: <a href="mailto:suporte@playrate.fun" style="color: var(--text-muted);">suporte@playrate.fun</a></p>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+        Este site é protegido por reCAPTCHA e aplicam-se a
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Política de Privacidade</a> e os
+        <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted);">Termos de Serviço</a> da Google.
+    </p>
+</footer>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js';
+    import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "%%GOOGLE_API%%",
+        authDomain: "gameboxarmindo.firebaseapp.com",
+        projectId: "gameboxarmindo",
+        storageBucket: "gameboxarmindo.appspot.com",
+        messagingSenderId: "230951536531",
+        appId: "1:230951536531:web:da7987332bb95b08554a66",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- Elementos da UI ---
+    const loadingInitialMessage = document.getElementById('loading-initial');
+    const adminContent = document.getElementById('admin-content');
+    const accessDeniedMessage = document.getElementById('access-denied');
+    const notLoggedInMessage = document.getElementById('not-logged-in');
+    const ticketsGrid = document.getElementById('tickets-grid');
+    const filterStatusSelect = document.getElementById('filter-status');
+    const loginLink = document.getElementById('loginLink');
+
+    let allTickets = [];
+
+    let authCheckCompleted = false;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (authCheckCompleted) return;
+
+        loadingInitialMessage.style.display = 'none';
+
+        const profileLink = document.getElementById('profileLink');
+        const settingsLink = document.getElementById('settingsLink');
+        const logoutLink = document.getElementById('logoutLink');
+
+        if (user) {
+            loginLink.style.display = 'none';
+            profileLink.style.display = 'inline-block';
+            settingsLink.style.display = 'inline-block';
+            logoutLink.style.display = 'inline-block';
+
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists() && userDocSnap.data().admin === true) {
+                adminContent.style.display = 'block';
+                accessDeniedMessage.style.display = 'none';
+                notLoggedInMessage.style.display = 'none';
+                fetchAllTickets();
+            } else {
+                adminContent.style.display = 'none';
+                accessDeniedMessage.style.display = 'block';
+                notLoggedInMessage.style.display = 'none';
+            }
+        } else {
+            loginLink.style.display = 'inline-block';
+            profileLink.style.display = 'none';
+            settingsLink.style.display = 'none';
+            logoutLink.style.display = 'none';
+
+            adminContent.style.display = 'none';
+            accessDeniedMessage.style.display = 'none';
+            notLoggedInMessage.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 3000);
+        }
+        authCheckCompleted = true;
+    });
+
+    async function fetchAllTickets() {
+        ticketsGrid.innerHTML = '<p class="loading-message">A carregar tickets...</p>';
+        try {
+            const q = query(collection(db, "tickets"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+
+            allTickets = [];
+            if (querySnapshot.empty) {
+                ticketsGrid.innerHTML = '<p class="no-tickets-message">Nenhum ticket encontrado.</p>';
+                return;
+            }
+
+            querySnapshot.forEach(doc => {
+                allTickets.push({ id: doc.id, ...doc.data() });
+            });
+            displayTickets(allTickets);
+
+        } catch (error) {
+            console.error("Erro ao carregar todos os tickets:", error);
+            ticketsGrid.innerHTML = '<p class="error-message">Ocorreu um erro ao carregar os tickets.</p>';
+        }
+    }
+
+    function displayTickets(ticketsToDisplay) {
+        ticketsGrid.innerHTML = '';
+
+        if (ticketsToDisplay.length === 0) {
+            ticketsGrid.innerHTML = '<p class="no-tickets-message">Nenhum ticket corresponde ao filtro selecionado.</p>';
+            return;
+        }
+
+        ticketsToDisplay.forEach(ticket => {
+            const createdAt = ticket.createdAt ? ticket.createdAt.toDate().toLocaleString('pt-BR') : 'N/A';
+            // Converte o status para classe CSS
+            const statusClass = `status-${ticket.status.toLowerCase().replace(/\s/g, '-')}`;
+
+            const ticketLink = document.createElement('a');
+            ticketLink.href = `admin-ticket-details.html?id=${ticket.id}`;
+            ticketLink.className = 'ticket-card-link';
+
+            const ticketCard = document.createElement('div');
+            ticketCard.className = 'ticket-card';
+            ticketCard.innerHTML = `
+                <h3>${ticket.subject}</h3>
+                <span class="ticket-status-admin ${statusClass}">${ticket.status}</span>
+                <p><strong>De:</strong> ${ticket.userEmail}</p>
+                <p><strong>Criado em:</strong> ${createdAt}</p>
+                <div class="description">${ticket.description.substring(0, 100)}...</div> `;
+            ticketLink.appendChild(ticketCard);
+            ticketsGrid.appendChild(ticketLink);
+        });
+    }
+
+    filterStatusSelect.addEventListener('change', () => {
+        const selectedStatus = filterStatusSelect.value;
+        if (selectedStatus === 'all') {
+            displayTickets(allTickets);
+        } else {
+            const filteredTickets = allTickets.filter(ticket => ticket.status === selectedStatus);
+            displayTickets(filteredTickets);
+        }
+    });
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error("Erro ao fazer logout:", error);
+            alert("Erro ao fazer logout. Tente novamente.");
+        });
+    });
+
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
