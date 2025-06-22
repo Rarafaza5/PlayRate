@@ -1039,7 +1039,8 @@
         const bannerColorPicker = document.getElementById('banner-color-picker');
         const avatarPreview = document.getElementById('avatar-preview');
         const bannerPreview = document.getElementById('banner-preview');
-        
+        const bannerColorInput = document.getElementById('banner-color-input'); // Added
+
         document.getElementById('displayName-input').value = profileData.displayName || profileData.username;
         document.getElementById('bio-input').value = profileData.bio || '';
         selectedEmoji = profileData.emojiProfile || '👤';
@@ -1047,9 +1048,19 @@
 
         avatarPreview.textContent = selectedEmoji;
         bannerPreview.style.backgroundColor = selectedBannerColor;
+        bannerColorInput.value = selectedBannerColor.startsWith('#') ? selectedBannerColor : '#1c1c24'; // Set initial value for the color input
 
         avatarPreview.onclick = () => { emojiPicker.style.display = emojiPicker.style.display === 'grid' ? 'none' : 'grid'; };
         bannerPreview.onclick = () => { bannerColorPicker.style.display = bannerColorPicker.style.display === 'flex' ? 'none' : 'flex'; };
+
+        // Event listener for the hidden color input
+        bannerColorInput.addEventListener('input', (event) => {
+            selectedBannerColor = event.target.value;
+            bannerPreview.style.backgroundColor = selectedBannerColor;
+            // Deselect any preset colors when a custom color is picked
+            bannerColorPicker.querySelectorAll('.color-swatch.selected').forEach(s => s.classList.remove('selected'));
+        });
+
 
         const emojis = ["😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","💩","👻","💀","☠️","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾"];
         emojiPicker.innerHTML = '';
@@ -1067,6 +1078,7 @@
             emojiPicker.appendChild(span);
         });
 
+        // Updated predefined colors to include one that matches the original light-bg for initial load
         const colors = ['#1c1c24', '#2a2a36', '#9f5dff', '#00adee', '#ff5566', '#28a745', '#f4c542'];
         bannerColorPicker.innerHTML = '';
         colors.forEach(color => {
@@ -1075,10 +1087,11 @@
             swatch.style.backgroundColor = color;
             if (color === selectedBannerColor) swatch.classList.add('selected');
             swatch.addEventListener('click', () => {
-                bannerColorPicker.querySelector('.selected')?.classList.remove('selected');
+                bannerColorPicker.querySelectorAll('.selected')?.forEach(s => s.classList.remove('selected')); // Deselect others
                 swatch.classList.add('selected');
                 selectedBannerColor = color;
                 bannerPreview.style.backgroundColor = selectedBannerColor;
+                bannerColorInput.value = selectedBannerColor; // Update the hidden input
                 bannerColorPicker.style.display = 'none';
             });
             bannerColorPicker.appendChild(swatch);
